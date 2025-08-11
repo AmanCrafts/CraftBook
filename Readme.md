@@ -135,7 +135,6 @@ A mobile and web platform that:
 ---
 
 ## 13. Next Steps (Short checklist)
-- [ ] Replace roll number placeholder
 - [ ] Create 6 wireframe screens (Onboarding, Home, Post View, Upload, Discover, Profile)
 - [ ] Build backend models and media pipeline
 - [ ] Implement annotation prototype
