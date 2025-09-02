@@ -5,6 +5,7 @@ import firebase from 'firebase/app'
 import { initializeApp } from 'firebase/app';
 
 import Register from './components/Register';
+import Login from './components/Login';
 
 
 
@@ -26,6 +27,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Register />
+      <Login />
       <StatusBar style="auto" />
     </View>
   );

@@ -1,8 +1,8 @@
 import React from 'react'
-import {useState, useEffet} from 'react'
+import { useState, useEffet } from 'react'
 import { View, Text, Button, TextInput, ActivityIndicator } from 'react-native'
-
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+
 
 const Register = () => {
     // State variables
@@ -19,36 +19,35 @@ const Register = () => {
     const auth = getAuth();
 
     // Handle form submission
-    const handleSubmit = () => {
+    const handleRegister = async () => {
         setLoading(true);
-        createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                const { user } = userCredential;
-                setUser(user);
-                setSuccess(true);
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                setError(errorMessage);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const { user } = userCredential;
+            setUser(user);
+            setSuccess(true);
+        } catch (error) {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            setError(errorMessage);
+        } finally {
+            setLoading(false);
+        }
     }
 
 
-  return (
-    <View>
-      <Text>Register</Text>
-      <TextInput placeholder="Name" value={name} onChangeText={setName} />
-      <TextInput placeholder="Email" value={email} onChangeText={setEmail} />
-      <TextInput placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
-      <TextInput placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry />
-      {error ? <Text>{error}</Text> : null}
-      {loading ? <ActivityIndicator /> : <Button title="Register" onPress={handleSubmit} />}
-    </View>
-  )
+
+    return (
+        <View>
+            <Text>Register</Text>
+            <TextInput placeholder="Name" value={name} onChangeText={setName} />
+            <TextInput placeholder="Email" value={email} onChangeText={setEmail} />
+            <TextInput placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
+            <TextInput placeholder="Confirm Password" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry />
+            {error ? <Text>{error}</Text> : null}
+            {loading ? <ActivityIndicator /> : <Button title="Register" onPress={handleRegister} />}
+        </View>
+    )
 }
 
 export default Register
