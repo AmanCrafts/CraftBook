@@ -22,6 +22,7 @@ expo-env.d.ts
 .env
 .env.*
 
+
 # Metro
 .metro-health-check*
 
