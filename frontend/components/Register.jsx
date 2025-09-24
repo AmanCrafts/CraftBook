@@ -2,6 +2,7 @@ import React from 'react'
 import { useState, useEffet } from 'react'
 import { View, Text, Button, TextInput, ActivityIndicator } from 'react-native'
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Register = () => {
