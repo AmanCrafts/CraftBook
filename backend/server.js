@@ -1,17 +1,22 @@
-const express = require('express');
-const cors = require('cors');
-
+import express, { json } from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { debug } from 'openai/core.mjs';
+dotenv.config()
 
 const app = express();
-const port = 3000;
 
-app.use(cors());
+
+
+const PORT = process.env.PORT
 app.use(express.json());
 
+app.get('/', (req, res) => {
+    res.status(200).send('The server is running.')
+})
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+
+app.listen(PORT, () => {
+
+    console.log(`Server is running on port ${PORT}`);
 });
-
-
-
