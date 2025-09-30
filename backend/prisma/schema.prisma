@@ -98,3 +98,4 @@ model Follow {
   @@unique([followerId, followingId])
   @@map("follows")
 }
+

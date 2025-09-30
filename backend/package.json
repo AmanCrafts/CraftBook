@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "nodemon server.js"
   },
-  "keywords": [],
   "type": "module",
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
@@ -16,7 +16,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
-    "prisma": "^6.16.2"
+    "prisma": "^6.16.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
