@@ -25,6 +25,10 @@ app.get('/api/users', (req, res) => {
     controllers.getAllUsers(req, res)
 });
 
+app.get('/api/users/google/:googleId', (req, res) => {
+    controllers.getUserByGoogleId(req, res)
+});
+
 app.post('/api/users', (req, res) => {
     controllers.createUser(req, res)
 })

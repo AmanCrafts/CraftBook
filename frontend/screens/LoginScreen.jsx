@@ -1,17 +1,23 @@
 import React from 'react'
-import { View, Text } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 
 import Login from '../components/Login'
 import Register from '../components/Register'
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
   return (
-    
-    <View>
-      <Login />
+    <View style={styles.container}>
+      <Login navigation={navigation} />
       <Register />
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+});
 
 export default LoginScreen  
