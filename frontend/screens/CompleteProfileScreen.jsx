@@ -39,9 +39,12 @@ const CompleteProfileScreen = ({ route, navigation }) => {
 
             if (response.ok) {
                 const savedUser = await response.json();
-                Alert.alert('Success', 'Profile saved successfully!');
-                // Navigate to main app (we'll add this later)
-                console.log('User saved:', savedUser);
+                Alert.alert('Success', 'Profile saved successfully!', [
+                    {
+                        text: 'OK',
+                        onPress: () => navigation.replace('MainApp')
+                    }
+                ]);
             } else {
                 const error = await response.json();
                 Alert.alert('Error', error.error || 'Failed to save profile');

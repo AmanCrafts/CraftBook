@@ -8,6 +8,7 @@ import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
 import LoginScreen from './screens/LoginScreen';
 import CompleteProfileScreen from './screens/CompleteProfileScreen';
+import MainTabs from './components/MainTabs';
 
 const Stack = createStackNavigator();
 
@@ -56,6 +57,14 @@ export default function App() {
           options={{ 
             title: 'Complete Profile',
             headerLeft: null, // Prevent going back
+          }}
+        />
+        <Stack.Screen 
+          name="MainApp" 
+          component={MainTabs} 
+          options={{ 
+            headerShown: false,
+            gestureEnabled: false, // Prevent going back with gesture
           }}
         />
       </Stack.Navigator>

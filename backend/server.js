@@ -21,6 +21,7 @@ app.get('/', (req, res) => {
     res.status(200).send('The server is running.')
 })
 
+// User routes
 app.get('/api/users', (req, res) => {
     controllers.getAllUsers(req, res)
 });
@@ -32,6 +33,27 @@ app.get('/api/users/google/:googleId', (req, res) => {
 app.post('/api/users', (req, res) => {
     controllers.createUser(req, res)
 })
+
+// Post routes
+app.post('/api/posts', (req, res) => {
+    controllers.createPost(req, res)
+});
+
+app.get('/api/posts', (req, res) => {
+    controllers.getAllPosts(req, res)
+});
+
+app.get('/api/posts/recent', (req, res) => {
+    controllers.getRecentPosts(req, res)
+});
+
+app.get('/api/posts/popular', (req, res) => {
+    controllers.getPopularPosts(req, res)
+});
+
+app.get('/api/posts/user/:userId', (req, res) => {
+    controllers.getPostsByUserId(req, res)
+});
 
 
 

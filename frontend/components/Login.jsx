@@ -43,8 +43,10 @@ const Login = ({ navigation }) => {
                 try {
                     const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/users/google/${user.uid}`);
                     if (response.ok) {
-                        Alert.alert('Welcome back!', `Hello ${user.email}`);
-                        // Navigate to main app (we'll add this later)
+                        const userData = await response.json();
+                        console.log('User profile found:', userData);
+                        // Navigate to main app
+                        navigation.replace('MainApp');
                     } else {
                         // User logged in but no profile, send to complete profile
                         navigation.navigate('CompleteProfile', {
