@@ -21,7 +21,7 @@ cd CraftBook
 
 2. **Install all dependencies from root**
 ```bash
-npm run install:all
+npm install
 ```
 
 3. **Set up environment variables**
