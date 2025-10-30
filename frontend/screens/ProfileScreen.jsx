@@ -37,14 +37,12 @@ const ProfileScreen = ({ navigation }) => {
 
             const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-            // Fetch user data
             const userResponse = await fetch(`${API_URL}/api/users/google/${currentUser.uid}`);
             const userData = await userResponse.json();
 
             if (userResponse.ok) {
                 setUser(userData);
 
-                // Fetch user's posts
                 const postsResponse = await fetch(`${API_URL}/api/posts/user/${userData.id}`);
                 const postsData = await postsResponse.json();
 

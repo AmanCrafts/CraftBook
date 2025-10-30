@@ -13,6 +13,7 @@
     "@react-navigation/bottom-tabs": "^7.4.9",
     "@react-navigation/native": "^7.1.18",
     "@react-navigation/stack": "^7.4.10",
+    "@supabase/supabase-js": "^2.77.0",
     "expo": "^54.0.15",
     "expo-auth-session": "~7.0.8",
     "expo-crypto": "~15.0.7",

@@ -28,7 +28,6 @@ const UploadScreen = ({ navigation }) => {
     ];
 
     const pickImage = async () => {
-        // Request permission
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
         if (status !== 'granted') {
@@ -36,7 +35,6 @@ const UploadScreen = ({ navigation }) => {
             return;
         }
 
-        // Pick image
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
@@ -90,31 +88,62 @@ const UploadScreen = ({ navigation }) => {
             const user = auth.currentUser;
             if (!user) {
                 Alert.alert('Error', 'You must be logged in to upload.');
+                setLoading(false);
                 return;
             }
 
-            // Get user from backend
             const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
+            // Get user from backend
             const userResponse = await fetch(`${API_URL}/api/users/google/${user.uid}`);
             const userData = await userResponse.json();
 
             if (!userResponse.ok) {
                 Alert.alert('Error', 'User not found. Please complete your profile.');
+                setLoading(false);
                 return;
             }
 
-            // For now, we'll use a placeholder image URL
-            // In production, you'd upload to cloud storage (Firebase Storage, AWS S3, etc.)
-            const imageUrl = image; // This would be replaced with actual cloud URL
+            // Upload image to Supabase via backend
+            const formData = new FormData();
 
-            // Create post
+            // Get the filename from the URI
+            const uriParts = image.split('/');
+            const fileName = uriParts[uriParts.length - 1];
+
+            // Create the file object for FormData
+            formData.append('image', {
+                uri: image,
+                type: 'image/jpeg', 
+                name: fileName,
+            });
+
+            const uploadResponse = await fetch(`${API_URL}/api/upload`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            const uploadData = await uploadResponse.json();
+
+            if (!uploadResponse.ok) {
+                Alert.alert('Error', uploadData.error || 'Failed to upload image.');
+                setLoading(false);
+                return;
+            }
+
+            // Create post with the uploaded image URL
+            const imageUrl = uploadData.image.url;
+
             const postData = {
-                userId: userData.id,
+                authorId: userData.id,
                 title: title.trim(),
                 description: description.trim(),
                 imageUrl: imageUrl,
                 medium: medium,
-                tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+                tags: tags.split(',').map(tag => tag.trim()).join(','),
             };
 
             const response = await fetch(`${API_URL}/api/posts`, {
@@ -138,17 +167,20 @@ const UploadScreen = ({ navigation }) => {
                             setDescription('');
                             setMedium('');
                             setTags('');
-                            // Navigate to Home to see the post
                             navigation.navigate('Home');
                         }
                     }
                 ]);
             } else {
-                Alert.alert('Error', data.error || 'Failed to upload post.');
+                const errorMessage = data.details
+                    ? `${data.error}: ${data.details}`
+                    : data.error || 'Failed to upload post.';
+                Alert.alert('Error', errorMessage);
+                console.error('Post creation error:', data);
             }
         } catch (error) {
             console.error('Upload error:', error);
-            Alert.alert('Error', 'An error occurred while uploading.');
+            Alert.alert('Error', 'An error occurred while uploading: ' + error.message);
         } finally {
             setLoading(false);
         }

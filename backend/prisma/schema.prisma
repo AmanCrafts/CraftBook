@@ -99,3 +99,11 @@ model Follow {
   @@map("follows")
 }
 
+model Image {
+  id        String   @id @default(cuid())
+  url       String // public URL from Supabase Storage
+  name      String
+  createdAt DateTime @default(now())
+
+  @@map("images")
+}

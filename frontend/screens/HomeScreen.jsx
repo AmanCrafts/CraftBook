@@ -15,7 +15,7 @@ const HomeScreen = ({ navigation }) => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
-    const [filter, setFilter] = useState('recent'); // recent, popular, following
+    const [filter, setFilter] = useState('recent');
     const auth = getAuth();
 
     const fetchPosts = async () => {
