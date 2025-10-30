@@ -1,5 +1,5 @@
 {
-  "name": "craftbook",
+  "name": "craftbook-frontend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -7,26 +7,6 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
-  },
-  "dependencies": {
-    "@react-native-async-storage/async-storage": "2.2.0",
-    "@react-navigation/bottom-tabs": "^7.4.9",
-    "@react-navigation/native": "^7.1.18",
-    "@react-navigation/stack": "^7.4.10",
-    "@supabase/supabase-js": "^2.77.0",
-    "expo": "^54.0.15",
-    "expo-auth-session": "~7.0.8",
-    "expo-crypto": "~15.0.7",
-    "expo-image-picker": "~17.0.8",
-    "expo-status-bar": "~3.0.8",
-    "firebase": "^12.2.1",
-    "react": "19.1.0",
-    "react-native": "0.81.4",
-    "react-native-safe-area-context": "^5.6.1",
-    "react-native-screens": "~4.16.0"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.20.0"
   },
   "private": true
 }

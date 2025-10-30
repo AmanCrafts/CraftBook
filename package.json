@@ -1,0 +1,61 @@
+{
+  "name": "craftbook",
+  "version": "1.0.0",
+  "description": "CraftBook - A social platform for artists",
+  "main": "backend/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "expo start ./frontend",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "nodemon backend/server.js",
+    "dev:frontend": "expo start ./frontend",
+    "start:android": "expo start --android --project-root ./frontend",
+    "start:ios": "expo start --ios --project-root ./frontend",
+    "start:web": "expo start --web --project-root ./frontend",
+    "prisma:migrate": "prisma migrate dev --schema=./backend/prisma/schema.prisma",
+    "prisma:generate": "prisma generate --schema=./backend/prisma/schema.prisma",
+    "prisma:studio": "prisma studio --schema=./backend/prisma/schema.prisma",
+    "test:backend": "node backend/test-db-connection.js"
+  },
+  "keywords": [
+    "react-native",
+    "expo",
+    "express",
+    "prisma",
+    "supabase",
+    "social-media",
+    "art"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.1",
+    "@prisma/client": "^6.16.2",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-navigation/bottom-tabs": "^7.4.9",
+    "@react-navigation/native": "^7.1.18",
+    "@react-navigation/stack": "^7.4.10",
+    "@supabase/supabase-js": "^2.77.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "expo": "^54.0.15",
+    "expo-auth-session": "~7.0.8",
+    "expo-crypto": "~15.0.7",
+    "expo-image-picker": "~17.0.8",
+    "expo-status-bar": "~3.0.8",
+    "express": "^5.1.0",
+    "firebase": "^12.2.1",
+    "multer": "^2.0.2",
+    "prisma": "^6.16.3",
+    "react": "19.1.0",
+    "react-native": "0.81.4",
+    "react-native-safe-area-context": "^5.6.1",
+    "react-native-screens": "~4.16.0"
+  },
+  "private": true
+}

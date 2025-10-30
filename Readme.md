@@ -4,6 +4,58 @@
 
 ---
 
+## Quick Start Guide
+
+### Prerequisites
+- Node.js 18+ and npm
+- Expo CLI (for mobile development)
+- PostgreSQL (via Supabase)
+
+### Installation
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/AmanCrafts/CraftBook.git
+cd CraftBook
+```
+
+2. **Install all dependencies from root**
+```bash
+npm run install:all
+```
+
+3. **Set up environment variables**
+- The `.env` file is already at the root with all configurations
+- Backend and frontend both read from this single `.env` file
+
+4. **Run Prisma migrations**
+```bash
+npm run prisma:migrate
+```
+
+5. **Start the application**
+
+
+```bash
+# Backend 
+npm run dev:backend
+
+# Frontend
+npm run dev:frontend
+```
+
+### Available Scripts (from root)
+- `npm run dev:backend` - Run backend server with nodemon
+- `npm run dev:frontend` - Run Expo development server
+- `npm run start:android` - Run on Android device/emulator
+- `npm run start:ios` - Run on iOS device/simulator
+- `npm run start:web` - Run on web browser
+- `npm run prisma:migrate` - Run database migrations
+- `npm run prisma:generate` - Generate Prisma client
+- `npm run prisma:studio` - Open Prisma Studio
+
+---
+
 ## 1. Project Snapshot
 **Title:** Craftbook — A Dedicated Visual-First Platform for Artists
 

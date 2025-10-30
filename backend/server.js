@@ -2,9 +2,16 @@ import express, { json } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import {controllers} from './controllers.js'
 
-dotenv.config()
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from root directory
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
+
 const app = express();
 
 const upload = multer({ 
