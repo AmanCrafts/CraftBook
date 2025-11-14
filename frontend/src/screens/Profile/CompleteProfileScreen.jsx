@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Button, Alert, ScrollView } from 'react-native';
+import { useAuth } from '../../contexts/AuthContext';
+import userAPI from '../../api/user.api';
 
 const CompleteProfileScreen = ({ route, navigation }) => {
-    const { googleUser } = route.params;
+    const { user: firebaseUser, setDbUser } = useAuth();
+    // Get googleUser from route params (when coming from login) or from context (when app restarts)
+    const googleUser = route.params?.googleUser || firebaseUser;
 
     const [name, setName] = useState(googleUser?.displayName || '');
     const [bio, setBio] = useState('');
@@ -18,6 +22,11 @@ const CompleteProfileScreen = ({ route, navigation }) => {
         setLoading(true);
 
         try {
+            if (!googleUser) {
+                Alert.alert('Error', 'User information not found');
+                return;
+            }
+
             // Create user data
             const userData = {
                 googleId: googleUser.uid,
@@ -28,27 +37,18 @@ const CompleteProfileScreen = ({ route, navigation }) => {
                 profilePicture: googleUser.photoURL || null
             };
 
-            // Send to backend
-            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/users`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData),
-            });
+            // Send to backend using API helper
+            const savedUser = await userAPI.createUser(userData);
 
-            if (response.ok) {
-                const savedUser = await response.json();
-                Alert.alert('Success', 'Profile saved successfully!', [
-                    {
-                        text: 'OK',
-                        onPress: () => navigation.replace('MainApp')
-                    }
-                ]);
-            } else {
-                const error = await response.json();
-                Alert.alert('Error', error.error || 'Failed to save profile');
-            }
+            // Update the dbUser in AuthContext so navigation knows profile is complete
+            setDbUser(savedUser);
+
+            Alert.alert('Success', 'Profile saved successfully!', [
+                {
+                    text: 'OK',
+                    onPress: () => navigation.replace('MainApp')
+                }
+            ]);
         } catch (error) {
             console.error('Error saving profile:', error);
             Alert.alert('Error', 'Something went wrong. Please try again.');
