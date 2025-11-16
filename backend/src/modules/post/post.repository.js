@@ -130,13 +130,22 @@ export async function findRecent(limit = 10) {
 }
 
 /**
- * Get popular posts
+ * Get popular posts (ordered by likes count)
  */
 export async function findPopular(limit = 10) {
     return await prisma.post.findMany({
-        orderBy: { views: 'desc' },
         take: limit,
-        include: { author: true },
+        include: { 
+            author: true,
+            _count: {
+                select: { likes: true, comments: true }
+            }
+        },
+        orderBy: {
+            likes: {
+                _count: 'desc'
+            }
+        }
     });
 }
 

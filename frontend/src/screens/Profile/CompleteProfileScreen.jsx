@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Button, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../contexts/AuthContext';
 import userAPI from '../../api/user.api';
+import Input from '../../components/common/Input';
+import Button from '../../components/common/Button';
+import COLORS from '../../constants/colors';
 
 const CompleteProfileScreen = ({ route, navigation }) => {
     const { user: firebaseUser, setDbUser } = useAuth();
@@ -58,85 +63,122 @@ const CompleteProfileScreen = ({ route, navigation }) => {
     };
 
     return (
-        <ScrollView style={styles.container}>
-            <Text style={styles.title}>Complete Your Profile</Text>
-            <Text style={styles.subtitle}>Tell us a bit about yourself</Text>
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.header}>
+                    <View style={styles.iconContainer}>
+                        <LinearGradient
+                            colors={[COLORS.primary, COLORS.primaryDark]}
+                            style={styles.iconGradient}
+                        >
+                            <Ionicons name="person-add-outline" size={36} color={COLORS.white} />
+                        </LinearGradient>
+                    </View>
+                    <Text style={styles.title}>Complete Your Profile</Text>
+                    <Text style={styles.subtitle}>Tell us a bit about yourself and your art</Text>
+                </View>
 
-            <View style={styles.form}>
-                <Text style={styles.label}>Name *</Text>
-                <TextInput
-                    style={styles.input}
-                    value={name}
-                    onChangeText={setName}
-                    placeholder="Enter your name"
-                />
+                <View style={styles.form}>
+                    <Input
+                        label="Full Name"
+                        value={name}
+                        onChangeText={setName}
+                        placeholder="Enter your name"
+                        icon="person-outline"
+                    />
 
-                <Text style={styles.label}>Bio</Text>
-                <TextInput
-                    style={[styles.input, styles.bioInput]}
-                    value={bio}
-                    onChangeText={setBio}
-                    placeholder="Tell us about yourself (optional)"
-                    multiline
-                    numberOfLines={3}
-                />
+                    <Input
+                        label="Bio (Optional)"
+                        value={bio}
+                        onChangeText={setBio}
+                        placeholder="Tell us about yourself and your artistic journey"
+                        multiline
+                        numberOfLines={4}
+                        icon="create-outline"
+                    />
 
-                <Text style={styles.label}>Favorite Art Medium</Text>
-                <TextInput
-                    style={styles.input}
-                    value={medium}
-                    onChangeText={setMedium}
-                    placeholder="e.g., Digital Art, Oil Painting, Sketching (optional)"
-                />
+                    <Input
+                        label="Favorite Art Medium (Optional)"
+                        value={medium}
+                        onChangeText={setMedium}
+                        placeholder="e.g., Digital Art, Oil Painting, Sketching"
+                        icon="color-palette-outline"
+                    />
 
-                <Button
-                    title={loading ? "Saving..." : "Save Profile"}
-                    onPress={handleSaveProfile}
-                    disabled={loading}
-                />
-            </View>
-        </ScrollView>
+                    <Button
+                        title="Complete Profile"
+                        onPress={handleSaveProfile}
+                        loading={loading}
+                        disabled={loading}
+                        fullWidth
+                        icon="checkmark-circle-outline"
+                        style={styles.saveButton}
+                    />
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        padding: 20,
+        backgroundColor: COLORS.background,
+    },
+    scrollView: {
+        flex: 1,
+    },
+    scrollContent: {
+        flexGrow: 1,
+        padding: 24,
+    },
+    header: {
+        alignItems: 'center',
+        marginTop: 40,
+        marginBottom: 32,
+    },
+    iconContainer: {
+        marginBottom: 20,
+    },
+    iconGradient: {
+        width: 72,
+        height: 72,
+        borderRadius: 18,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowColor: COLORS.primary,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.3,
+        shadowRadius: 10,
+        elevation: 6,
     },
     title: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: 'bold',
+        color: COLORS.text,
         textAlign: 'center',
-        marginBottom: 10,
+        marginBottom: 8,
     },
     subtitle: {
-        fontSize: 16,
+        fontSize: 15,
+        color: COLORS.textSecondary,
         textAlign: 'center',
-        color: '#666',
-        marginBottom: 30,
+        paddingHorizontal: 32,
+        lineHeight: 22,
     },
     form: {
         flex: 1,
     },
-    label: {
-        fontSize: 16,
-        fontWeight: '500',
-        marginBottom: 5,
-        marginTop: 15,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
-        padding: 12,
-        fontSize: 16,
-        backgroundColor: '#f9f9f9',
-    },
-    bioInput: {
-        height: 80,
-        textAlignVertical: 'top',
+    saveButton: {
+        marginTop: 16,
+        marginBottom: 32,
     },
 });
 

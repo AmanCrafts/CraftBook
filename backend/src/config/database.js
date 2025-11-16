@@ -23,9 +23,9 @@ export function getClient() {
 export async function connect() {
     try {
         await prismaClient.$connect();
-        console.log('✅ Database connected successfully');
+        console.log('[DB] Database connected successfully');
     } catch (error) {
-        console.error('❌ Database connection failed:', error);
+        console.error('[DB] Database connection failed:', error);
         throw error;
     }
 }

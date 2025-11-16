@@ -29,6 +29,7 @@
     "expo-auth-session": "~7.0.8",
     "expo-crypto": "~15.0.7",
     "expo-image-picker": "~17.0.8",
+    "expo-linear-gradient": "~15.0.7",
     "expo-status-bar": "~3.0.8",
     "firebase": "^12.2.1",
     "react": "19.1.0",

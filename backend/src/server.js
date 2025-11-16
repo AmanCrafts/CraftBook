@@ -30,7 +30,7 @@ const startServer = async () => {
             console.log(`\n${signal} received. Starting graceful shutdown...`);
             
             server.close(async () => {
-                console.log('✅ HTTP server closed');
+                console.log('[SERVER] HTTP server closed');
                 
                 // Close database connection
                 await database.disconnect();
@@ -51,7 +51,7 @@ const startServer = async () => {
         process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
     } catch (error) {
-        console.error('❌ Failed to start server:', error);
+        console.error('[SERVER] Failed to start server:', error);
         process.exit(1);
     }
 };

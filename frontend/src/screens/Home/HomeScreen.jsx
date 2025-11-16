@@ -8,8 +8,11 @@ import {
     ActivityIndicator,
     TouchableOpacity
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { getAuth } from 'firebase/auth';
 import PostCard from '../../components/common/PostCard';
+import COLORS from '../../constants/colors';
 
 const HomeScreen = ({ navigation }) => {
     const [posts, setPosts] = useState([]);
@@ -57,6 +60,15 @@ const HomeScreen = ({ navigation }) => {
         console.log('Post pressed:', post.id);
     };
 
+    const getFilterIcon = (filterType) => {
+        switch (filterType) {
+            case 'recent': return 'time-outline';
+            case 'popular': return 'flame-outline';
+            case 'following': return 'people-outline';
+            default: return 'grid-outline';
+        }
+    };
+
     const renderFilterButton = (filterType, label) => (
         <TouchableOpacity
             style={[
@@ -64,7 +76,14 @@ const HomeScreen = ({ navigation }) => {
                 filter === filterType && styles.filterButtonActive
             ]}
             onPress={() => setFilter(filterType)}
+            activeOpacity={0.7}
         >
+            <Ionicons
+                name={getFilterIcon(filterType)}
+                size={18}
+                color={filter === filterType ? COLORS.white : COLORS.textSecondary}
+                style={styles.filterIcon}
+            />
             <Text style={[
                 styles.filterButtonText,
                 filter === filterType && styles.filterButtonTextActive
@@ -84,10 +103,20 @@ const HomeScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>CraftBook</Text>
-                <Text style={styles.headerSubtitle}>Discover Amazing Art</Text>
-            </View>
+            <LinearGradient
+                colors={[COLORS.primary, COLORS.primaryDark]}
+                style={styles.header}
+            >
+                <View style={styles.headerContent}>
+                    <View style={styles.headerLeft}>
+                        <Ionicons name="brush" size={28} color={COLORS.white} />
+                        <View style={styles.headerTextContainer}>
+                            <Text style={styles.headerTitle}>CraftBook</Text>
+                            <Text style={styles.headerSubtitle}>Discover Amazing Art</Text>
+                        </View>
+                    </View>
+                </View>
+            </LinearGradient>
 
             <View style={styles.filterContainer}>
                 {renderFilterButton('recent', 'Recent')}
@@ -125,76 +154,96 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: COLORS.backgroundSecondary,
     },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: COLORS.backgroundSecondary,
     },
     header: {
-        backgroundColor: '#fff',
         paddingTop: 50,
-        paddingBottom: 15,
+        paddingBottom: 20,
         paddingHorizontal: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
+    },
+    headerContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    headerLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    headerTextContainer: {
+        marginLeft: 12,
     },
     headerTitle: {
-        fontSize: 28,
+        fontSize: 24,
         fontWeight: 'bold',
-        color: '#f4511e',
+        color: COLORS.white,
     },
     headerSubtitle: {
-        fontSize: 14,
-        color: '#666',
-        marginTop: 5,
+        fontSize: 13,
+        color: COLORS.white,
+        opacity: 0.9,
+        marginTop: 2,
     },
     filterContainer: {
         flexDirection: 'row',
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
+        paddingHorizontal: 16,
+        paddingVertical: 16,
+        backgroundColor: COLORS.white,
         gap: 10,
+        shadowColor: COLORS.black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
     },
     filterButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
         paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 20,
-        backgroundColor: '#f0f0f0',
+        paddingVertical: 10,
+        borderRadius: 24,
+        backgroundColor: COLORS.backgroundSecondary,
     },
     filterButtonActive: {
-        backgroundColor: '#f4511e',
+        backgroundColor: COLORS.primary,
+    },
+    filterIcon: {
+        marginRight: 6,
     },
     filterButtonText: {
         fontSize: 14,
-        color: '#666',
-        fontWeight: '500',
+        color: COLORS.textSecondary,
+        fontWeight: '600',
     },
     filterButtonTextActive: {
-        color: '#fff',
+        color: COLORS.white,
     },
     listContent: {
-        padding: 15,
+        padding: 16,
     },
     emptyContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 60,
+        paddingVertical: 80,
+        paddingHorizontal: 40,
     },
     emptyTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#333',
+        color: COLORS.text,
         marginBottom: 8,
     },
     emptySubtitle: {
         fontSize: 14,
-        color: '#666',
+        color: COLORS.textSecondary,
         textAlign: 'center',
+        lineHeight: 20,
     },
 });
 

@@ -18,11 +18,11 @@ export const requestLogger = (req, res, next) => {
         
         // Color code by status
         if (res.statusCode >= 500) {
-            console.error('❌', JSON.stringify(log));
+            console.error('[ERROR]', JSON.stringify(log));
         } else if (res.statusCode >= 400) {
             console.warn('⚠️ ', JSON.stringify(log));
         } else {
-            console.log('✅', JSON.stringify(log));
+            console.log('[SUCCESS]', JSON.stringify(log));
         }
     });
     
