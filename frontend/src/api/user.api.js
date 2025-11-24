@@ -1,5 +1,5 @@
-import httpClient from './httpClient';
-import API_ENDPOINTS from '../constants/apiEndpoints';
+import httpClient from "./httpClient";
+import API_ENDPOINTS from "../constants/apiEndpoints";
 
 // User API - all user-related API calls
 

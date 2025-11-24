@@ -20,8 +20,8 @@ CraftBook/
 │   │   │   │   ├── user.repository.js      # Data access layer
 │   │   │   │   └── user.routes.js          # Route definitions
 │   │   │   ├── post/
-│   │   │   │   ├── post.controller.js      
-│   │   │   │   ├── post.service.js 
+│   │   │   │   ├── post.controller.js
+│   │   │   │   ├── post.service.js
 │   │   │   │   ├── post.repository.js
 │   │   │   │   └── post.routes.js
 │   │   │   └── upload/
@@ -99,6 +99,7 @@ CraftBook/
 - Node.js 18+ and npm
 - Expo CLI (for mobile development)
 - PostgreSQL (via Supabase)
+- Firebase account (for authentication)
 
 ### Installation
 
@@ -125,14 +126,49 @@ npm install
 
 4. **Set up environment variables**
 
-- Backend: Configure `backend/.env` with your database and Supabase credentials
-- Frontend: Configure `frontend/.env` with your Firebase and API settings
+**Backend** (`backend/.env`):
+
+```env
+DATABASE_URL="postgresql://..."
+SUPABASE_URL="https://your-project.supabase.co"
+SUPABASE_ANON_KEY="your-anon-key"
+SUPABASE_BUCKET_NAME="Images"
+PORT=3000
+NODE_ENV=development
+```
+
+**Frontend** (`frontend/.env`):
+
+```env
+# Firebase Configuration
+EXPO_PUBLIC_FIREBASE_API_KEY=your-api-key
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your-app.firebaseapp.com
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your-app.appspot.com
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+EXPO_PUBLIC_FIREBASE_APP_ID=your-app-id
+
+# Supabase Configuration
+EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+EXPO_PUBLIC_SUPABASE_BUCKET_NAME=Images
+
+# Backend URL (use your computer's local IP for mobile devices)
+EXPO_PUBLIC_API_URL=http://YOUR_LOCAL_IP:3000
+```
+
+> **Note:** Replace `YOUR_LOCAL_IP` with your computer's IP address. Get it by running:
+>
+> ```bash
+> ifconfig | grep "inet " | grep -v 127.0.0.1
+> ```
 
 5. **Run Prisma migrations (in backend directory)**
 
 ```bash
 cd backend
-npm run prisma:migrate
+npx prisma migrate dev
+npx prisma generate
 ```
 
 6. **Start the application**
@@ -148,8 +184,10 @@ npm run dev
 
 ```bash
 cd frontend
-npm start
+npx expo start --clear
 ```
+
+Then scan the QR code with Expo Go app on your mobile device.
 
 ### Available Scripts
 
@@ -209,12 +247,24 @@ A mobile and web platform that:
 
 ## 4. Key Features (Clear, bite-sized items)
 
-1. **Lossless Upload & Zoomable Viewer** — Upload high-res images with optional watermarking.
-2. **Process Stages & Time-lapse** — Multi-step posts that show evolution from sketch to final.
-3. **Annotation Critique Mode** — Draw-on-image feedback (public or private) with versioned replies.
-4. **Commission & Storefront** — Commission requests, direct sales, and order tracking.
-5. **Explore by Medium & Curated Challenges** — Powerful filters and community-driven events.
-6. **Collab Board & Matchmaking** — Post project invites and find collaborators by skill and style.
+### Currently Implemented ✅
+
+1. **Firebase Authentication** — Secure email/password authentication with session persistence
+2. **Complete Profile System** — Enhanced modular profile with avatar, banner images, bio, and medium
+3. **Image Upload to Supabase** — Upload and manage profile pictures and banner images
+4. **Modern Design System** — Indigo/purple color palette with reusable Button and Input components
+5. **Post Feed** — View recent and popular artwork posts with filtering
+6. **Profile Editing** — Full-screen modal for updating profile information
+7. **Responsive UI** — Modern gradient headers, icons, and smooth transitions
+
+### Planned Features 🚧
+
+1. **Lossless Upload & Zoomable Viewer** — Upload high-res images with optional watermarking
+2. **Process Stages & Time-lapse** — Multi-step posts that show evolution from sketch to final
+3. **Annotation Critique Mode** — Draw-on-image feedback (public or private) with versioned replies
+4. **Commission & Storefront** — Commission requests, direct sales, and order tracking
+5. **Explore by Medium & Curated Challenges** — Powerful filters and community-driven events
+6. **Collab Board & Matchmaking** — Post project invites and find collaborators by skill and style
 
 ---
 
@@ -239,17 +289,41 @@ A mobile and web platform that:
 
 ---
 
-## 7. Technology Stack (Concise)
+## 7. Technology Stack
 
-**Mobile:** React Native or Flutter
-**Web:** React + Tailwind
-**Backend:** Node.js (Express) or Django
-**DB:** PostgreSQL + S3-compatible media storage
-**Realtime:** Socket.IO or Firebase
-**Media tools:** Sharp / Pillow + FFmpeg
-**Payments:** Stripe / Razorpay
-**Search:** Algolia or ElasticSearch
-**CI/CD & Hosting:** Docker, GitHub Actions, AWS / DigitalOcean
+### Frontend
+
+- **Framework:** React Native (Expo SDK 54)
+- **Navigation:** React Navigation (Stack + Bottom Tabs)
+- **Authentication:** Firebase Auth with AsyncStorage persistence
+- **State Management:** React Context API (AuthContext)
+- **UI Components:** Custom components (Button, Input) with modern design
+- **Icons:** Ionicons from @expo/vector-icons
+- **Gradients:** expo-linear-gradient
+- **Image Handling:** expo-image-picker
+
+### Backend
+
+- **Runtime:** Node.js with Express.js
+- **Database:** PostgreSQL (Supabase)
+- **ORM:** Prisma
+- **Image Storage:** Supabase Storage
+- **Architecture:** Modular repository pattern
+
+### Current Stack Highlights
+
+- Modern indigo/purple design system
+- Modular profile architecture (6 reusable components)
+- Image upload with quality preservation
+- Real-time authentication state management
+
+### Future Additions
+
+- **Realtime:** Socket.IO or Firebase Realtime
+- **Media tools:** Sharp for image processing
+- **Payments:** Stripe / Razorpay
+- **Search:** Algolia or ElasticSearch
+- **CI/CD:** Docker, GitHub Actions
 
 ---
 

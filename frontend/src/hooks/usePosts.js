@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import postAPI from '../api/post.api';
+import { useState, useEffect } from "react";
+import postAPI from "../api/post.api";
 
 // Fetch and manage posts with filter (recent/popular)
-export const usePosts = (filter = 'recent') => {
+export const usePosts = (filter = "recent") => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,10 +14,10 @@ export const usePosts = (filter = 'recent') => {
 
       let data;
       switch (filter) {
-        case 'popular':
+        case "popular":
           data = await postAPI.getPopularPosts();
           break;
-        case 'recent':
+        case "recent":
         default:
           data = await postAPI.getRecentPosts();
           break;
@@ -25,7 +25,7 @@ export const usePosts = (filter = 'recent') => {
 
       setPosts(data);
     } catch (err) {
-      console.error('Error fetching posts:', err);
+      console.error("Error fetching posts:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -54,7 +54,7 @@ export const usePost = (postId) => {
       const data = await postAPI.getPostById(postId);
       setPost(data);
     } catch (err) {
-      console.error('Error fetching post:', err);
+      console.error("Error fetching post:", err);
       setError(err.message);
     } finally {
       setLoading(false);

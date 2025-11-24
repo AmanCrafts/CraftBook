@@ -1,11 +1,11 @@
-import { API_CONFIG } from '../config';
+import { API_CONFIG } from "../config";
 
 // HTTP Client - centralized fetch wrapper for API calls
 
 // Base URL and default headers
 const baseURL = API_CONFIG.baseURL;
 const defaultHeaders = {
-  'Content-Type': 'application/json',
+  "Content-Type": "application/json",
 };
 
 // Make HTTP request
@@ -26,14 +26,14 @@ async function request(endpoint, options = {}) {
     if (!response.ok) {
       throw {
         status: response.status,
-        message: data.error || 'Request failed',
+        message: data.error || "Request failed",
         details: data.details,
       };
     }
 
     return data;
   } catch (error) {
-    console.error('HTTP Client Error:', error);
+    console.error("HTTP Client Error:", error);
     throw error;
   }
 }
@@ -42,7 +42,7 @@ async function request(endpoint, options = {}) {
 export function get(endpoint, options = {}) {
   return request(endpoint, {
     ...options,
-    method: 'GET',
+    method: "GET",
   });
 }
 
@@ -50,7 +50,7 @@ export function get(endpoint, options = {}) {
 export function post(endpoint, body, options = {}) {
   return request(endpoint, {
     ...options,
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify(body),
   });
 }
@@ -59,7 +59,7 @@ export function post(endpoint, body, options = {}) {
 export function put(endpoint, body, options = {}) {
   return request(endpoint, {
     ...options,
-    method: 'PUT',
+    method: "PUT",
     body: JSON.stringify(body),
   });
 }
@@ -68,7 +68,7 @@ export function put(endpoint, body, options = {}) {
 export function deleteRequest(endpoint, options = {}) {
   return request(endpoint, {
     ...options,
-    method: 'DELETE',
+    method: "DELETE",
   });
 }
 
@@ -76,7 +76,7 @@ export function deleteRequest(endpoint, options = {}) {
 export function postFormData(endpoint, formData, options = {}) {
   return request(endpoint, {
     ...options,
-    method: 'POST',
+    method: "POST",
     headers: {
       // Don't set Content-Type for FormData
       ...options.headers,

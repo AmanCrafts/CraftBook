@@ -1,382 +1,363 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-    View,
-    Text,
-    StyleSheet,
-    Image,
-    TouchableOpacity,
-    ScrollView,
-    FlatList,
-    Alert,
-    ActivityIndicator,
-} from 'react-native';
-import { getAuth, signOut } from 'firebase/auth';
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+  TouchableOpacity,
+  Share,
+} from "react-native";
+import { getAuth, signOut } from "firebase/auth";
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import ProfileHeader from "../../components/profile/ProfileHeader";
+import ProfileInfo from "../../components/profile/ProfileInfo";
+import ProfileStats from "../../components/profile/ProfileStats";
+import ProfileActions from "../../components/profile/ProfileActions";
+import ProfilePostsGrid from "../../components/profile/ProfilePostsGrid";
+import EditProfileModal from "../../components/profile/EditProfileModal";
+import uploadAPI from "../../api/upload.api";
+import userAPI from "../../api/user.api";
+import postAPI from "../../api/post.api";
+import COLORS from "../../constants/colors";
 
 const ProfileScreen = ({ navigation }) => {
-    const [user, setUser] = useState(null);
-    const [posts, setPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [stats, setStats] = useState({
-        posts: 0,
+  const [user, setUser] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [stats, setStats] = useState({
+    posts: 0,
+    followers: 0,
+    following: 0,
+  });
+  const auth = getAuth();
+
+  useEffect(() => {
+    loadUserProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const loadUserProfile = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        navigation.replace("Login");
+        return;
+      }
+
+      const userData = await userAPI.getUserByGoogleId(currentUser.uid);
+      setUser(userData);
+
+      const userPosts = await postAPI.getPostsByUserId(userData.id);
+      setPosts(userPosts);
+
+      setStats({
+        posts: userPosts.length,
         followers: 0,
         following: 0,
-    });
-    const auth = getAuth();
+      });
+    } catch (error) {
+      console.error("Error loading profile:", error);
+      Alert.alert("Error", "Failed to load profile");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    useEffect(() => {
-        fetchUserData();
-    }, []);
+  const pickAvatar = async () => {
+    try {
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    const fetchUserData = async () => {
-        try {
-            const currentUser = auth.currentUser;
-            if (!currentUser) {
-                navigation.replace('Login');
-                return;
-            }
-
-            const API_URL = process.env.EXPO_PUBLIC_API_URL;
-
-            const userResponse = await fetch(`${API_URL}/api/users/google/${currentUser.uid}`);
-            const userData = await userResponse.json();
-
-            if (userResponse.ok) {
-                setUser(userData);
-
-                const postsResponse = await fetch(`${API_URL}/api/posts/user/${userData.id}`);
-                const postsData = await postsResponse.json();
-
-                if (postsResponse.ok) {
-                    setPosts(postsData);
-                    setStats(prev => ({ ...prev, posts: postsData.length }));
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching user data:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleLogout = () => {
+      if (permissionResult.granted === false) {
         Alert.alert(
-            'Logout',
-            'Are you sure you want to logout?',
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Logout',
-                    style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            await signOut(auth);
-                            navigation.replace('Login');
-                        } catch (error) {
-                            console.error('Logout error:', error);
-                            Alert.alert('Error', 'Failed to logout');
-                        }
-                    }
-                }
-            ]
+          "Permission Required",
+          "Please allow access to your photo library",
         );
-    };
+        return;
+      }
 
-    const handleEditProfile = () => {
-        Alert.alert('Coming Soon', 'Edit profile feature will be available soon!');
-    };
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
 
-    const renderPostItem = ({ item }) => (
-        <TouchableOpacity style={styles.postItem}>
-            <Image
-                source={{ uri: item.imageUrl || 'https://via.placeholder.com/150' }}
-                style={styles.postImage}
-            />
-        </TouchableOpacity>
-    );
+      if (!result.canceled && result.assets[0]) {
+        setUploadingImage(true);
+        const imageUri = result.assets[0].uri;
 
-    if (loading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#f4511e" />
-            </View>
-        );
+        const uploadResult = await uploadAPI.uploadImage(imageUri);
+
+        await userAPI.updateUser(user.id, {
+          profilePicture: uploadResult.url,
+        });
+
+        setUser((prev) => ({ ...prev, profilePicture: uploadResult.url }));
+        Alert.alert("Success", "Profile picture updated");
+      }
+    } catch (error) {
+      console.error("Error updating profile picture:", error);
+      Alert.alert("Error", "Failed to update profile picture");
+    } finally {
+      setUploadingImage(false);
     }
+  };
 
-    if (!user) {
-        return (
-            <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>User not found</Text>
-                <TouchableOpacity style={styles.button} onPress={() => navigation.replace('Login')}>
-                    <Text style={styles.buttonText}>Back to Login</Text>
-                </TouchableOpacity>
-            </View>
+  const pickBannerImage = async () => {
+    try {
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (permissionResult.granted === false) {
+        Alert.alert(
+          "Permission Required",
+          "Please allow access to your photo library",
         );
-    }
+        return;
+      }
 
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [16, 9],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setUploadingImage(true);
+        const imageUri = result.assets[0].uri;
+
+        const uploadResult = await uploadAPI.uploadImage(imageUri);
+
+        await userAPI.updateUser(user.id, {
+          bannerImage: uploadResult.url,
+        });
+
+        setUser((prev) => ({ ...prev, bannerImage: uploadResult.url }));
+        Alert.alert("Success", "Banner image updated");
+      }
+    } catch (error) {
+      console.error("Error updating banner image:", error);
+      Alert.alert("Error", "Failed to update banner image");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleUpdateProfile = async (data) => {
+    try {
+      await userAPI.updateUser(user.id, data);
+      setUser((prev) => ({ ...prev, ...data }));
+      setEditModalVisible(false);
+      Alert.alert("Success", "Profile updated successfully");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      Alert.alert("Error", "Failed to update profile");
+      throw error;
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `Check out ${user.name}'s profile on CraftBook!`,
+      });
+    } catch (error) {
+      console.error("Error sharing profile:", error);
+    }
+  };
+
+  const handleSettings = () => {
+    Alert.alert("Settings", "Settings feature coming soon!");
+  };
+
+  const handleLogout = () => {
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await signOut(auth);
+            navigation.replace("Login");
+          } catch (error) {
+            console.error("Logout error:", error);
+            Alert.alert("Error", "Failed to logout");
+          }
+        },
+      },
+    ]);
+  };
+
+  if (loading) {
     return (
-        <ScrollView style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity
-                    style={styles.logoutButton}
-                    onPress={handleLogout}
-                >
-                    <Text style={styles.logoutButtonText}>Logout</Text>
-                </TouchableOpacity>
-            </View>
-
-            {/* Profile Info */}
-            <View style={styles.profileSection}>
-                <Image
-                    source={{ uri: user.profilePicture || 'https://via.placeholder.com/100' }}
-                    style={styles.avatar}
-                />
-                <Text style={styles.name}>{user.name}</Text>
-                {user.medium && (
-                    <Text style={styles.medium}>{user.medium}</Text>
-                )}
-                {user.bio && (
-                    <Text style={styles.bio}>{user.bio}</Text>
-                )}
-
-                {/* Stats */}
-                <View style={styles.statsContainer}>
-                    <View style={styles.statItem}>
-                        <Text style={styles.statNumber}>{stats.posts}</Text>
-                        <Text style={styles.statLabel}>Posts</Text>
-                    </View>
-                    <View style={styles.statDivider} />
-                    <View style={styles.statItem}>
-                        <Text style={styles.statNumber}>{stats.followers}</Text>
-                        <Text style={styles.statLabel}>Followers</Text>
-                    </View>
-                    <View style={styles.statDivider} />
-                    <View style={styles.statItem}>
-                        <Text style={styles.statNumber}>{stats.following}</Text>
-                        <Text style={styles.statLabel}>Following</Text>
-                    </View>
-                </View>
-
-                {/* Edit Profile Button */}
-                <TouchableOpacity
-                    style={styles.editButton}
-                    onPress={handleEditProfile}
-                >
-                    <Text style={styles.editButtonText}>Edit Profile</Text>
-                </TouchableOpacity>
-            </View>
-
-            {/* Posts Grid */}
-            <View style={styles.postsSection}>
-                <Text style={styles.sectionTitle}>Your Artwork</Text>
-                {posts.length > 0 ? (
-                    <FlatList
-                        data={posts}
-                        keyExtractor={(item) => item.id.toString()}
-                        renderItem={renderPostItem}
-                        numColumns={3}
-                        scrollEnabled={false}
-                        columnWrapperStyle={styles.postsRow}
-                    />
-                ) : (
-                    <View style={styles.emptyPosts}>
-                        <Text style={styles.emptyText}>No posts yet</Text>
-                        <Text style={styles.emptySubtext}>
-                            Share your first artwork!
-                        </Text>
-                        <TouchableOpacity
-                            style={styles.uploadButton}
-                            onPress={() => navigation.navigate('Upload')}
-                        >
-                            <Text style={styles.uploadButtonText}>Upload Artwork</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
-            </View>
-        </ScrollView>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </View>
     );
+  }
+
+  if (!user) {
+    return (
+      <View style={styles.errorContainer}>
+        <Ionicons
+          name="person-circle-outline"
+          size={80}
+          color={COLORS.gray400}
+        />
+        <Text style={styles.errorText}>User not found</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.replace("Login")}
+        >
+          <Text style={styles.buttonText}>Back to Login</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <ProfileHeader
+          bannerImage={user.bannerImage}
+          profilePicture={user.profilePicture}
+          onEditBanner={pickBannerImage}
+          onEditAvatar={pickAvatar}
+          editable
+        />
+
+        <ProfileInfo
+          name={user.name}
+          bio={user.bio}
+          medium={user.medium}
+          email={user.email}
+        />
+
+        <ProfileStats
+          posts={stats.posts}
+          followers={stats.followers}
+          following={stats.following}
+        />
+
+        <ProfileActions
+          onEdit={() => setEditModalVisible(true)}
+          onShare={handleShare}
+          onSettings={handleSettings}
+          isOwnProfile
+        />
+
+        <ProfilePostsGrid
+          posts={posts}
+          onPostPress={(post) => console.log("Post pressed:", post.id)}
+          onUploadPress={() => navigation.navigate("Upload")}
+        />
+      </ScrollView>
+
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Ionicons name="log-out-outline" size={20} color={COLORS.danger} />
+      </TouchableOpacity>
+
+      <EditProfileModal
+        visible={editModalVisible}
+        user={user}
+        onClose={() => setEditModalVisible(false)}
+        onSave={handleUpdateProfile}
+      />
+
+      {uploadingImage && (
+        <View style={styles.uploadingOverlay}>
+          <View style={styles.uploadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.primary} />
+            <Text style={styles.uploadingText}>Uploading image...</Text>
+          </View>
+        </View>
+      )}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f5f5f5',
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5',
-    },
-    errorContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5',
-        padding: 20,
-    },
-    errorText: {
-        fontSize: 18,
-        color: '#666',
-        marginBottom: 20,
-    },
-    button: {
-        backgroundColor: '#f4511e',
-        paddingVertical: 12,
-        paddingHorizontal: 30,
-        borderRadius: 8,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    header: {
-        backgroundColor: '#fff',
-        paddingTop: 50,
-        paddingHorizontal: 20,
-        paddingBottom: 15,
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
-    },
-    logoutButton: {
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#f4511e',
-    },
-    logoutButtonText: {
-        color: '#f4511e',
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    profileSection: {
-        backgroundColor: '#fff',
-        padding: 20,
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
-    },
-    avatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        backgroundColor: '#e0e0e0',
-        marginBottom: 15,
-    },
-    name: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 5,
-    },
-    medium: {
-        fontSize: 16,
-        color: '#f4511e',
-        marginBottom: 10,
-    },
-    bio: {
-        fontSize: 14,
-        color: '#666',
-        textAlign: 'center',
-        marginBottom: 20,
-        paddingHorizontal: 20,
-    },
-    statsContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 20,
-        paddingVertical: 15,
-        width: '100%',
-        justifyContent: 'center',
-    },
-    statItem: {
-        alignItems: 'center',
-        flex: 1,
-    },
-    statNumber: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    statLabel: {
-        fontSize: 12,
-        color: '#666',
-        marginTop: 5,
-    },
-    statDivider: {
-        width: 1,
-        height: 40,
-        backgroundColor: '#e0e0e0',
-    },
-    editButton: {
-        backgroundColor: '#f4511e',
-        paddingVertical: 10,
-        paddingHorizontal: 40,
-        borderRadius: 8,
-        width: '100%',
-        alignItems: 'center',
-    },
-    editButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    postsSection: {
-        backgroundColor: '#fff',
-        marginTop: 10,
-        padding: 20,
-        minHeight: 300,
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 15,
-    },
-    postsRow: {
-        gap: 5,
-    },
-    postItem: {
-        flex: 1,
-        aspectRatio: 1,
-        margin: 2,
-    },
-    postImage: {
-        width: '100%',
-        height: '100%',
-        backgroundColor: '#e0e0e0',
-        borderRadius: 8,
-    },
-    emptyPosts: {
-        alignItems: 'center',
-        paddingVertical: 40,
-    },
-    emptyText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 5,
-    },
-    emptySubtext: {
-        fontSize: 14,
-        color: '#666',
-        marginBottom: 20,
-    },
-    uploadButton: {
-        backgroundColor: '#f4511e',
-        paddingVertical: 12,
-        paddingHorizontal: 30,
-        borderRadius: 8,
-    },
-    uploadButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '600',
-    },
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.gray50,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: COLORS.gray50,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: COLORS.gray50,
+    padding: 20,
+    gap: 16,
+  },
+  errorText: {
+    fontSize: 18,
+    color: COLORS.gray600,
+    fontWeight: "600",
+  },
+  button: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 12,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  logoutButton: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.white,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    zIndex: 10,
+  },
+  uploadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  uploadingContainer: {
+    backgroundColor: COLORS.white,
+    padding: 24,
+    borderRadius: 16,
+    alignItems: "center",
+    gap: 12,
+  },
+  uploadingText: {
+    fontSize: 16,
+    color: COLORS.gray700,
+    fontWeight: "600",
+  },
 });
 
 export default ProfileScreen;

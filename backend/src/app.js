@@ -1,9 +1,12 @@
-import express from 'express';
-import cors from 'cors';
-import config from './config/index.js';
-import apiV1Routes from './api/v1/index.js';
-import { requestLogger } from './middlewares/logger.middleware.js';
-import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js';
+import express from "express";
+import cors from "cors";
+import config from "./config/index.js";
+import apiV1Routes from "./api/v1/index.js";
+import { requestLogger } from "./middlewares/logger.middleware.js";
+import {
+  errorHandler,
+  notFoundHandler,
+} from "./middlewares/error.middleware.js";
 
 /**
  * Initialize Express Application
@@ -22,8 +25,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Request Logger
-if (config.nodeEnv === 'development') {
-    app.use(requestLogger);
+if (config.nodeEnv === "development") {
+  app.use(requestLogger);
 }
 
 /**
@@ -31,17 +34,17 @@ if (config.nodeEnv === 'development') {
  */
 
 // Root endpoint
-app.get('/', (req, res) => {
-    res.status(200).json({
-        message: 'CraftBook API Server',
-        version: '1.0.0',
-        status: 'running',
-        environment: config.nodeEnv,
-    });
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "CraftBook API Server",
+    version: "1.0.0",
+    status: "running",
+    environment: config.nodeEnv,
+  });
 });
 
 // API v1 routes
-app.use('/api', apiV1Routes);
+app.use("/api", apiV1Routes);
 
 /**
  * Error Handling

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import uploadAPI from '../api/upload.api';
+import { useState } from "react";
+import uploadAPI from "../api/upload.api";
 
 // Handle image uploads
 export const useUpload = () => {
@@ -16,7 +16,7 @@ export const useUpload = () => {
 
       return result;
     } catch (err) {
-      console.error('Upload error:', err);
+      console.error("Upload error:", err);
       setError(err.message);
       throw err;
     } finally {
@@ -29,7 +29,7 @@ export const useUpload = () => {
       setError(null);
       await uploadAPI.deleteImage(imageId);
     } catch (err) {
-      console.error('Delete error:', err);
+      console.error("Delete error:", err);
       setError(err.message);
       throw err;
     }

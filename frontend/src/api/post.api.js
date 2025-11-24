@@ -1,5 +1,5 @@
-import httpClient from './httpClient';
-import API_ENDPOINTS from '../constants/apiEndpoints';
+import httpClient from "./httpClient";
+import API_ENDPOINTS from "../constants/apiEndpoints";
 
 // Post API - all post-related API calls
 

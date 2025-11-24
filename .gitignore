@@ -1,0 +1,42 @@
+# Root-level .gitignore for CraftBook project
+
+# Documentation build artifacts
+*.html
+*.pdf
+!Readme.md
+!README.md
+!*.md
+
+# IDE workspace settings
+.vscode/settings.json
+.vscode/launch.json
+.idea/workspace.xml
+.idea/tasks.xml
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.cache/
+
+# Package manager locks (optional - uncomment if you want to ignore)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Environment files at root level
+.env
+.env.local
+.env*.local

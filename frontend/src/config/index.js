@@ -1,11 +1,11 @@
-import ENV from './env';
+import ENV from "./env";
 
 // App Configuration - central configuration for the entire app
 
 export const APP_CONFIG = {
-  appName: 'CraftBook',
-  version: '1.0.0',
-  environment: __DEV__ ? 'development' : 'production',
+  appName: "CraftBook",
+  version: "1.0.0",
+  environment: __DEV__ ? "development" : "production",
 };
 
 export const FIREBASE_CONFIG = {

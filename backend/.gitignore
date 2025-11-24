@@ -5,15 +5,55 @@ node_modules/
 .env
 .env.local
 .env*.local
+.env.development
+.env.production
+.env.test
 
-# Debug
+# Debug & Logs
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+pnpm-debug.log*
+logs/
+*.log
+lerna-debug.log*
+
+# Testing & Coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# Build output
+dist/
+build/
+out/
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
 
 # macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
 *.pem
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 
 # Prisma
 generated/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/

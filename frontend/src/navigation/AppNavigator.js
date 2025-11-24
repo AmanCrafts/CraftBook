@@ -1,13 +1,13 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import ROUTES from '../constants/routes';
-import { useAuth } from '../contexts/AuthContext';
+import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
+import ROUTES from "../constants/routes";
+import { useAuth } from "../contexts/AuthContext";
 
 // Import screens
-import LoginScreen from '../screens/Auth/LoginScreen';
-import CompleteProfileScreen from '../screens/Profile/CompleteProfileScreen';
-import MainNavigator from './MainNavigator';
+import LoginScreen from "../screens/Auth/LoginScreen";
+import CompleteProfileScreen from "../screens/Profile/CompleteProfileScreen";
+import MainNavigator from "./MainNavigator";
 
 const Stack = createStackNavigator();
 
@@ -40,11 +40,11 @@ const AppNavigator = () => {
       initialRouteName={getInitialRoute()}
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#f4511e',
+          backgroundColor: "#f4511e",
         },
-        headerTintColor: '#fff',
+        headerTintColor: "#fff",
         headerTitleStyle: {
-          fontWeight: 'bold',
+          fontWeight: "bold",
         },
       }}
     >
@@ -52,7 +52,7 @@ const AppNavigator = () => {
         name={ROUTES.LOGIN}
         component={LoginScreen}
         options={{
-          title: 'CraftBook',
+          title: "CraftBook",
           headerShown: false,
         }}
       />
@@ -60,7 +60,7 @@ const AppNavigator = () => {
         name={ROUTES.COMPLETE_PROFILE}
         component={CompleteProfileScreen}
         options={{
-          title: 'Complete Profile',
+          title: "Complete Profile",
           headerLeft: null, // Prevent going back
         }}
       />
@@ -79,9 +79,9 @@ const AppNavigator = () => {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
 });
 

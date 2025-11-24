@@ -1,4 +1,4 @@
-import postAPI from '../api/post.api';
+import postAPI from "../api/post.api";
 
 // Post service - handles post-related business logic
 
@@ -7,13 +7,13 @@ export async function createPost(postData) {
   try {
     // Validate required fields
     if (!postData.title || !postData.imageUrl || !postData.authorId) {
-      throw new Error('Missing required fields');
+      throw new Error("Missing required fields");
     }
 
     // Process tags
     let tags = postData.tags;
     if (Array.isArray(tags)) {
-      tags = tags.join(',');
+      tags = tags.join(",");
     }
 
     const post = await postAPI.createPost({
@@ -23,7 +23,7 @@ export async function createPost(postData) {
 
     return { success: true, data: post };
   } catch (error) {
-    console.error('Create post error:', error);
+    console.error("Create post error:", error);
     return { success: false, error: error.message };
   }
 }
@@ -34,7 +34,7 @@ export async function updatePost(postId, updates) {
     const post = await postAPI.updatePost(postId, updates);
     return { success: true, data: post };
   } catch (error) {
-    console.error('Update post error:', error);
+    console.error("Update post error:", error);
     return { success: false, error: error.message };
   }
 }
@@ -45,7 +45,7 @@ export async function deletePost(postId) {
     await postAPI.deletePost(postId);
     return { success: true };
   } catch (error) {
-    console.error('Delete post error:', error);
+    console.error("Delete post error:", error);
     return { success: false, error: error.message };
   }
 }
@@ -55,7 +55,7 @@ export async function getPosts(page = 1, limit = 10) {
   try {
     // This would require pagination support in the API
     const posts = await postAPI.getAllPosts();
-    
+
     // Client-side pagination
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
@@ -72,7 +72,7 @@ export async function getPosts(page = 1, limit = 10) {
       },
     };
   } catch (error) {
-    console.error('Get posts error:', error);
+    console.error("Get posts error:", error);
     return { success: false, error: error.message };
   }
 }

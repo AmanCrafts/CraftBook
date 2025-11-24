@@ -1,13 +1,13 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
-import ROUTES from '../constants/routes';
-import COLORS from '../constants/colors';
+import React from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Ionicons } from "@expo/vector-icons";
+import ROUTES from "../constants/routes";
+import COLORS from "../constants/colors";
 
 // Import screens
-import HomeScreen from '../screens/Home/HomeScreen';
-import UploadScreen from '../screens/Upload/UploadScreen';
-import ProfileScreen from '../screens/Profile/ProfileScreen';
+import HomeScreen from "../screens/Home/HomeScreen";
+import UploadScreen from "../screens/Upload/UploadScreen";
+import ProfileScreen from "../screens/Profile/ProfileScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -34,18 +34,18 @@ const MainNavigator = () => {
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '600',
+          fontWeight: "600",
           marginTop: 4,
         },
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
           if (route.name === ROUTES.HOME) {
-            iconName = focused ? 'home' : 'home-outline';
+            iconName = focused ? "home" : "home-outline";
           } else if (route.name === ROUTES.UPLOAD) {
-            iconName = focused ? 'add-circle' : 'add-circle-outline';
+            iconName = focused ? "add-circle" : "add-circle-outline";
           } else if (route.name === ROUTES.PROFILE) {
-            iconName = focused ? 'person' : 'person-outline';
+            iconName = focused ? "person" : "person-outline";
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -56,21 +56,21 @@ const MainNavigator = () => {
         name={ROUTES.HOME}
         component={HomeScreen}
         options={{
-          tabBarLabel: 'Home',
+          tabBarLabel: "Home",
         }}
       />
       <Tab.Screen
         name={ROUTES.UPLOAD}
         component={UploadScreen}
         options={{
-          tabBarLabel: 'Upload',
+          tabBarLabel: "Upload",
         }}
       />
       <Tab.Screen
         name={ROUTES.PROFILE}
         component={ProfileScreen}
         options={{
-          tabBarLabel: 'Profile',
+          tabBarLabel: "Profile",
         }}
       />
     </Tab.Navigator>

@@ -1,8 +1,8 @@
-import React from 'react'
-import { View, StyleSheet } from 'react-native'
+import React from "react";
+import { View, StyleSheet } from "react-native";
 
-import Login from '../../components/common/Login'
-import Register from '../../components/common/Register'
+import Login from "../../components/common/Login";
+import Register from "../../components/common/Register";
 
 const LoginScreen = ({ navigation }) => {
   return (
@@ -10,14 +10,14 @@ const LoginScreen = ({ navigation }) => {
       <Login navigation={navigation} />
       <Register />
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
 });
 
-export default LoginScreen  
+export default LoginScreen;

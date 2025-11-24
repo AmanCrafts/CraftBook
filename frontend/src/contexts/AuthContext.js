@@ -1,6 +1,6 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import userAPI from '../api/user.api';
+import React, { createContext, useState, useEffect, useContext } from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import userAPI from "../api/user.api";
 
 const AuthContext = createContext({});
 
@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
           const userData = await userAPI.getUserByGoogleId(firebaseUser.uid);
           setDbUser(userData);
         } catch (error) {
-          console.log('User profile not found in database:', error);
+          console.log("User profile not found in database:", error);
           setDbUser(null);
         }
       } else {
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

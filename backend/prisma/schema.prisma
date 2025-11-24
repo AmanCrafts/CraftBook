@@ -21,6 +21,7 @@ model User {
   name           String
   bio            String?  @db.Text
   profilePicture String?
+  bannerImage    String?
   medium         String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

@@ -1,5 +1,5 @@
-import { getAuth, signOut as firebaseSignOut } from 'firebase/auth';
-import userAPI from '../api/user.api';
+import { getAuth, signOut as firebaseSignOut } from "firebase/auth";
+import userAPI from "../api/user.api";
 
 // Authentication service - handles auth-related business logic
 
@@ -12,7 +12,7 @@ export async function signOut() {
     await firebaseSignOut(auth);
     return { success: true };
   } catch (error) {
-    console.error('Sign out error:', error);
+    console.error("Sign out error:", error);
     return { success: false, error: error.message };
   }
 }
@@ -37,7 +37,7 @@ export async function saveProfile(userData) {
   try {
     const currentUser = getCurrentUser();
     if (!currentUser) {
-      throw new Error('No authenticated user');
+      throw new Error("No authenticated user");
     }
 
     // Check if user exists
@@ -59,7 +59,7 @@ export async function saveProfile(userData) {
       return { success: true, data: created };
     }
   } catch (error) {
-    console.error('Save profile error:', error);
+    console.error("Save profile error:", error);
     return { success: false, error: error.message };
   }
 }
