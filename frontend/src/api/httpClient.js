@@ -74,15 +74,37 @@ export function deleteRequest(endpoint, options = {}) {
 
 // HTTP POST request for FormData (file uploads)
 export function postFormData(endpoint, formData, options = {}) {
-  return request(endpoint, {
+  const url = `${baseURL}${endpoint}`;
+  const config = {
     ...options,
     method: "POST",
     headers: {
-      // Don't set Content-Type for FormData
+      // Don't set Content-Type header - let browser/fetch set it with boundary
+      'Accept': 'application/json',
       ...options.headers,
     },
     body: formData,
-  });
+  };
+
+  // Use separate fetch for FormData to avoid JSON parsing issues
+  return fetch(url, config)
+    .then(async (response) => {
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw {
+          status: response.status,
+          message: data.error || "Request failed",
+          details: data.details,
+        };
+      }
+      
+      return data;
+    })
+    .catch((error) => {
+      console.error("HTTP Client Error:", error);
+      throw error;
+    });
 }
 
 // Default export for compatibility

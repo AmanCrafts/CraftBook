@@ -85,27 +85,28 @@ const ProfileScreen = ({ navigation }) => {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 0.8,
+        quality: 1,
       });
 
       if (!result.canceled && result.assets[0]) {
         setUploadingImage(true);
-        const imageUri = result.assets[0].uri;
-
-        const uploadResult = await uploadAPI.uploadImage(imageUri);
-
-        await userAPI.updateUser(user.id, {
-          profilePicture: uploadResult.url,
-        });
-
-        setUser((prev) => ({ ...prev, profilePicture: uploadResult.url }));
-        Alert.alert("Success", "Profile picture updated");
+        try {
+          const uploadResult = await uploadAPI.uploadImage(result.assets[0].uri);
+          await userAPI.updateUser(user.id, {
+            profilePicture: uploadResult.image.url,
+          });
+          setUser((prev) => ({ ...prev, profilePicture: uploadResult.image.url }));
+          Alert.alert("Success", "Profile picture updated");
+        } catch (error) {
+          console.error("Error uploading avatar:", error);
+          Alert.alert("Error", "Failed to update profile picture");
+        } finally {
+          setUploadingImage(false);
+        }
       }
     } catch (error) {
-      console.error("Error updating profile picture:", error);
-      Alert.alert("Error", "Failed to update profile picture");
-    } finally {
-      setUploadingImage(false);
+      console.error("Error picking avatar:", error);
+      Alert.alert("Error", "Failed to pick image");
     }
   };
 
@@ -126,27 +127,28 @@ const ProfileScreen = ({ navigation }) => {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [16, 9],
-        quality: 0.8,
+        quality: 1,
       });
 
       if (!result.canceled && result.assets[0]) {
         setUploadingImage(true);
-        const imageUri = result.assets[0].uri;
-
-        const uploadResult = await uploadAPI.uploadImage(imageUri);
-
-        await userAPI.updateUser(user.id, {
-          bannerImage: uploadResult.url,
-        });
-
-        setUser((prev) => ({ ...prev, bannerImage: uploadResult.url }));
-        Alert.alert("Success", "Banner image updated");
+        try {
+          const uploadResult = await uploadAPI.uploadImage(result.assets[0].uri);
+          await userAPI.updateUser(user.id, {
+            bannerImage: uploadResult.image.url,
+          });
+          setUser((prev) => ({ ...prev, bannerImage: uploadResult.image.url }));
+          Alert.alert("Success", "Banner image updated");
+        } catch (error) {
+          console.error("Error uploading banner:", error);
+          Alert.alert("Error", "Failed to update banner image");
+        } finally {
+          setUploadingImage(false);
+        }
       }
     } catch (error) {
-      console.error("Error updating banner image:", error);
-      Alert.alert("Error", "Failed to update banner image");
-    } finally {
-      setUploadingImage(false);
+      console.error("Error picking banner:", error);
+      Alert.alert("Error", "Failed to pick image");
     }
   };
 
