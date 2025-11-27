@@ -65,11 +65,17 @@ export function put(endpoint, body, options = {}) {
 }
 
 // HTTP DELETE request
-export function deleteRequest(endpoint, options = {}) {
-  return request(endpoint, {
+export function deleteRequest(endpoint, body = null, options = {}) {
+  const config = {
     ...options,
     method: "DELETE",
-  });
+  };
+  
+  if (body) {
+    config.body = JSON.stringify(body);
+  }
+  
+  return request(endpoint, config);
 }
 
 // HTTP POST request for FormData (file uploads)
@@ -80,7 +86,7 @@ export function postFormData(endpoint, formData, options = {}) {
     method: "POST",
     headers: {
       // Don't set Content-Type header - let browser/fetch set it with boundary
-      'Accept': 'application/json',
+      Accept: "application/json",
       ...options.headers,
     },
     body: formData,
@@ -90,7 +96,7 @@ export function postFormData(endpoint, formData, options = {}) {
   return fetch(url, config)
     .then(async (response) => {
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw {
           status: response.status,
@@ -98,7 +104,7 @@ export function postFormData(endpoint, formData, options = {}) {
           details: data.details,
         };
       }
-      
+
       return data;
     })
     .catch((error) => {

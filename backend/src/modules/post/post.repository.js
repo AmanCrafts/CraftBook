@@ -11,7 +11,12 @@ import { prisma } from "../../config/database.js";
 export async function create(postData) {
   return await prisma.post.create({
     data: postData,
-    include: { author: true },
+    include: {
+      author: true,
+      _count: {
+        select: { likes: true, comments: true },
+      },
+    },
   });
 }
 
@@ -21,7 +26,12 @@ export async function create(postData) {
 export async function findById(id) {
   return await prisma.post.findUnique({
     where: { id },
-    include: { author: true },
+    include: {
+      author: true,
+      _count: {
+        select: { likes: true, comments: true },
+      },
+    },
   });
 }
 
@@ -30,7 +40,12 @@ export async function findById(id) {
  */
 export async function findAll() {
   return await prisma.post.findMany({
-    include: { author: true },
+    include: {
+      author: true,
+      _count: {
+        select: { likes: true, comments: true },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -41,7 +56,12 @@ export async function findAll() {
 export async function findByUserId(userId) {
   return await prisma.post.findMany({
     where: { authorId: userId },
-    include: { author: true },
+    include: {
+      author: true,
+      _count: {
+        select: { likes: true, comments: true },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -56,7 +76,12 @@ export async function findByTag(tag) {
         has: tag,
       },
     },
-    include: { author: true },
+    include: {
+      author: true,
+      _count: {
+        select: { likes: true, comments: true },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -67,7 +92,12 @@ export async function findByTag(tag) {
 export async function findByMedium(medium) {
   return await prisma.post.findMany({
     where: { medium },
-    include: { author: true },
+    include: {
+      author: true,
+      _count: {
+        select: { likes: true, comments: true },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -81,7 +111,12 @@ export async function findByTagAndMedium(tag, medium) {
       tags: { has: tag },
       medium,
     },
-    include: { author: true },
+    include: {
+      author: true,
+      _count: {
+        select: { likes: true, comments: true },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -97,7 +132,12 @@ export async function searchByTitle(title) {
         mode: "insensitive",
       },
     },
-    include: { author: true },
+    include: {
+      author: true,
+      _count: {
+        select: { likes: true, comments: true },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -113,7 +153,12 @@ export async function searchByDescription(description) {
         mode: "insensitive",
       },
     },
-    include: { author: true },
+    include: {
+      author: true,
+      _count: {
+        select: { likes: true, comments: true },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -125,7 +170,12 @@ export async function findRecent(limit = 10) {
   return await prisma.post.findMany({
     orderBy: { createdAt: "desc" },
     take: limit,
-    include: { author: true },
+    include: {
+      author: true,
+      _count: {
+        select: { likes: true, comments: true },
+      },
+    },
   });
 }
 
@@ -155,7 +205,12 @@ export async function findPopular(limit = 10) {
 export async function findProcessPosts() {
   return await prisma.post.findMany({
     where: { isProcessPost: true },
-    include: { author: true },
+    include: {
+      author: true,
+      _count: {
+        select: { likes: true, comments: true },
+      },
+    },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -167,7 +222,12 @@ export async function update(id, postData) {
   return await prisma.post.update({
     where: { id },
     data: postData,
-    include: { author: true },
+    include: {
+      author: true,
+      _count: {
+        select: { likes: true, comments: true },
+      },
+    },
   });
 }
 

@@ -18,6 +18,9 @@ export const COLORS = {
   backgroundTertiary: "#f3f4f6",
   surface: "#ffffff",
 
+  //icon colors
+  likeIcon: "#ff0000ff",
+
   // Text Colors
   text: "#111827",
   textSecondary: "#6b7280",

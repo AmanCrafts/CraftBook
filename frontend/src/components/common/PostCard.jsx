@@ -1,14 +1,19 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import COLORS from "../../constants/colors";
+import LikeButton from "./LikeButton";
 
-const PostCard = ({ post, onPress }) => {
+const PostCard = ({ post, onPress, onCommentPress, userId, initialLiked }) => {
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress}>
-      <Image
-        source={{ uri: post.imageUrl || "https://via.placeholder.com/400" }}
-        style={styles.image}
-        resizeMode="cover"
-      />
+    <View style={styles.card}>
+      <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
+        <Image
+          source={{ uri: post.imageUrl || "https://via.placeholder.com/400" }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      </TouchableOpacity>
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.artistInfo}>
@@ -36,26 +41,41 @@ const PostCard = ({ post, onPress }) => {
         )}
 
         <View style={styles.footer}>
-          <View style={styles.stats}>
-            <Text style={styles.statText}>
-              Likes: {post._count?.likes || 0}
-            </Text>
-            <Text style={styles.statText}>
-              Comments: {post._count?.comments || 0}
-            </Text>
+          <View style={styles.actions}>
+            <LikeButton
+              postId={post.id}
+              initialLiked={initialLiked}
+              initialCount={post._count?.likes || 0}
+              userId={userId}
+            />
+            <TouchableOpacity
+              style={styles.actionItem}
+              onPress={(e) => {
+                e.stopPropagation();
+                onCommentPress?.();
+              }}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="chatbubble-outline"
+                size={20}
+                color={COLORS.primary}
+              />
+              <Text style={styles.actionText}>{post._count?.comments || 0}</Text>
+            </TouchableOpacity>
           </View>
           <Text style={styles.timeAgo}>
             {new Date(post.createdAt).toLocaleDateString()}
           </Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
     marginBottom: 20,
     borderRadius: 12,
     shadowColor: "#000",
@@ -68,7 +88,7 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: 300,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: COLORS.gray200,
   },
   content: {
     padding: 15,
@@ -88,27 +108,27 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     marginRight: 10,
-    backgroundColor: "#e0e0e0",
+    backgroundColor: COLORS.gray200,
   },
   artistName: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#333",
+    color: COLORS.text,
   },
   medium: {
     fontSize: 12,
-    color: "#666",
+    color: COLORS.textSecondary,
     marginTop: 2,
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#222",
+    color: COLORS.text,
     marginBottom: 5,
   },
   description: {
     fontSize: 14,
-    color: "#555",
+    color: COLORS.textSecondary,
     lineHeight: 20,
     marginBottom: 10,
   },
@@ -119,19 +139,25 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
+    borderTopColor: COLORS.gray200,
   },
-  stats: {
+  actions: {
     flexDirection: "row",
-    gap: 15,
+    gap: 20,
   },
-  statText: {
+  actionItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  actionText: {
     fontSize: 14,
-    color: "#666",
+    fontWeight: "600",
+    color: COLORS.textSecondary,
   },
   timeAgo: {
     fontSize: 12,
-    color: "#999",
+    color: COLORS.textTertiary,
   },
 });
 

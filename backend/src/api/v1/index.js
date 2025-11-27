@@ -2,6 +2,8 @@ import express from "express";
 import userRoutes from "../../modules/user/user.routes.js";
 import postRoutes from "../../modules/post/post.routes.js";
 import uploadRoutes from "../../modules/upload/upload.routes.js";
+import likeRoutes from "../../modules/like/like.routes.js";
+import commentRoutes from "../../modules/comment/comment.routes.js";
 
 const router = express.Router();
 
@@ -22,6 +24,8 @@ router.get("/health", (req, res) => {
 // Mount module routes
 router.use("/users", userRoutes);
 router.use("/posts", postRoutes);
+router.use("/posts", likeRoutes);
+router.use("/posts", commentRoutes);
 router.use("/upload", uploadRoutes);
 
 export default router;

@@ -7,6 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 // Import screens
 import LoginScreen from "../screens/Auth/LoginScreen";
 import CompleteProfileScreen from "../screens/Profile/CompleteProfileScreen";
+import PostDetailScreen from "../screens/PostDetail/PostDetailScreen";
 import MainNavigator from "./MainNavigator";
 
 const Stack = createStackNavigator();
@@ -70,6 +71,13 @@ const AppNavigator = () => {
         options={{
           headerShown: false,
           gestureEnabled: false, // Prevent going back with gesture
+        }}
+      />
+      <Stack.Screen
+        name="PostDetail"
+        component={PostDetailScreen}
+        options={{
+          headerShown: false,
         }}
       />
     </Stack.Navigator>

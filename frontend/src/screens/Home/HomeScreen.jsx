@@ -13,13 +13,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
 import PostCard from "../../components/common/PostCard";
 import COLORS from "../../constants/colors";
+import { likeAPI } from "../../api/like.api";
 
 const HomeScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState("recent");
+  const [likedPosts, setLikedPosts] = useState({});
   const auth = getAuth();
+  const currentUserId = auth.currentUser?.uid;
 
   const fetchPosts = async () => {
     try {
@@ -36,6 +39,23 @@ const HomeScreen = ({ navigation }) => {
 
       if (response.ok) {
         setPosts(data);
+
+        // Fetch like status for all posts
+        if (currentUserId) {
+          const likeStatuses = {};
+          await Promise.all(
+            data.map(async (post) => {
+              try {
+                const liked = await likeAPI.checkUserLike(post.id, currentUserId);
+                likeStatuses[post.id] = liked;
+              } catch (error) {
+                console.error(`Error checking like for post ${post.id}:`, error);
+                likeStatuses[post.id] = false;
+              }
+            })
+          );
+          setLikedPosts(likeStatuses);
+        }
       } else {
         console.error("Error fetching posts:", data.error);
       }
@@ -57,7 +77,11 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handlePostPress = (post) => {
-    console.log("Post pressed:", post.id);
+    // Removed - clicking card no longer navigates
+  };
+
+  const handleCommentPress = (post) => {
+    navigation.navigate("PostDetail", { postId: post.id });
   };
 
   const getFilterIcon = (filterType) => {
@@ -134,7 +158,13 @@ const HomeScreen = ({ navigation }) => {
         data={posts}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <PostCard post={item} onPress={() => handlePostPress(item)} />
+          <PostCard
+            post={item}
+            onPress={() => handleCommentPress(item)}
+            onCommentPress={() => handleCommentPress(item)}
+            userId={currentUserId}
+            initialLiked={likedPosts[item.id] || false}
+          />
         )}
         contentContainerStyle={styles.listContent}
         refreshControl={

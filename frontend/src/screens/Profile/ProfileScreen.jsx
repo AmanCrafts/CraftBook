@@ -91,11 +91,16 @@ const ProfileScreen = ({ navigation }) => {
       if (!result.canceled && result.assets[0]) {
         setUploadingImage(true);
         try {
-          const uploadResult = await uploadAPI.uploadImage(result.assets[0].uri);
+          const uploadResult = await uploadAPI.uploadImage(
+            result.assets[0].uri,
+          );
           await userAPI.updateUser(user.id, {
             profilePicture: uploadResult.image.url,
           });
-          setUser((prev) => ({ ...prev, profilePicture: uploadResult.image.url }));
+          setUser((prev) => ({
+            ...prev,
+            profilePicture: uploadResult.image.url,
+          }));
           Alert.alert("Success", "Profile picture updated");
         } catch (error) {
           console.error("Error uploading avatar:", error);
@@ -133,7 +138,9 @@ const ProfileScreen = ({ navigation }) => {
       if (!result.canceled && result.assets[0]) {
         setUploadingImage(true);
         try {
-          const uploadResult = await uploadAPI.uploadImage(result.assets[0].uri);
+          const uploadResult = await uploadAPI.uploadImage(
+            result.assets[0].uri,
+          );
           await userAPI.updateUser(user.id, {
             bannerImage: uploadResult.image.url,
           });
@@ -258,7 +265,7 @@ const ProfileScreen = ({ navigation }) => {
 
         <ProfilePostsGrid
           posts={posts}
-          onPostPress={(post) => console.log("Post pressed:", post.id)}
+          onPostPress={(post) => navigation.navigate("PostDetail", { postId: post.id })}
           onUploadPress={() => navigation.navigate("Upload")}
         />
       </ScrollView>
