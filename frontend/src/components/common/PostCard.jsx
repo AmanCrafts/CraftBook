@@ -1,16 +1,46 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { useState, useEffect } from "react";
+import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
 import LikeButton from "./LikeButton";
 
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const MAX_IMAGE_HEIGHT = 500;
+const MIN_IMAGE_HEIGHT = 200;
+
 const PostCard = ({ post, onPress, onCommentPress, userId, initialLiked }) => {
+  const [imageHeight, setImageHeight] = useState(300);
+
+  useEffect(() => {
+    if (post.imageUrl) {
+      Image.getSize(
+        post.imageUrl,
+        (width, height) => {
+          const aspectRatio = height / width;
+          const calculatedHeight = SCREEN_WIDTH * aspectRatio;
+          
+          // Clamp height between min and max
+          const finalHeight = Math.min(
+            Math.max(calculatedHeight, MIN_IMAGE_HEIGHT),
+            MAX_IMAGE_HEIGHT
+          );
+          
+          setImageHeight(finalHeight);
+        },
+        (error) => {
+          console.log("Error getting image size:", error);
+          setImageHeight(300); // fallback to default
+        }
+      );
+    }
+  }, [post.imageUrl]);
+
   return (
     <View style={styles.card}>
       <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
         <Image
           source={{ uri: post.imageUrl || "https://via.placeholder.com/400" }}
-          style={styles.image}
+          style={[styles.image, { height: imageHeight }]}
           resizeMode="cover"
         />
       </TouchableOpacity>
@@ -87,7 +117,6 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 300,
     backgroundColor: COLORS.gray200,
   },
   content: {
