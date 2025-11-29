@@ -4,7 +4,6 @@ import uploadAPI from "../api/upload.api";
 // Handle image uploads
 export const useUpload = () => {
   const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
 
   const uploadImage = async (imageUri) => {

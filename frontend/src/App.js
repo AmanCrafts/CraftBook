@@ -1,20 +1,19 @@
-import React from "react";
-import { StatusBar } from "expo-status-bar";
-import { NavigationContainer } from "@react-navigation/native";
-import { initializeApp } from "firebase/app";
-import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
-
-import AppNavigator from "./navigation/AppNavigator";
+import { NavigationContainer } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
+import { initializeApp } from "firebase/app";
+import { getReactNativePersistence, initializeAuth } from "firebase/auth";
 import { FIREBASE_CONFIG } from "./config/index";
 import { AuthProvider } from "./contexts/AuthContext";
+import AppNavigator from "./navigation/AppNavigator";
 
 // Main App Component
 export default function App() {
   // Initialize Firebase
   const app = initializeApp(FIREBASE_CONFIG);
 
-  const auth = initializeAuth(app, {
+  // Initialize auth with persistence
+  initializeAuth(app, {
     persistence: getReactNativePersistence(ReactNativeAsyncStorage),
   });
 

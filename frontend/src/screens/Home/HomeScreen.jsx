@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  RefreshControl,
-  ActivityIndicator,
-  TouchableOpacity,
-} from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { getAuth } from "firebase/auth";
+import { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { likeAPI } from "../../api/like.api";
 import PostCard from "../../components/common/PostCard";
 import COLORS from "../../constants/colors";
-import { likeAPI } from "../../api/like.api";
 
 const HomeScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
@@ -24,7 +24,7 @@ const HomeScreen = ({ navigation }) => {
   const auth = getAuth();
   const currentUserId = auth.currentUser?.uid;
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -46,10 +46,16 @@ const HomeScreen = ({ navigation }) => {
           await Promise.all(
             data.map(async (post) => {
               try {
-                const liked = await likeAPI.checkUserLike(post.id, currentUserId);
+                const liked = await likeAPI.checkUserLike(
+                  post.id,
+                  currentUserId
+                );
                 likeStatuses[post.id] = liked;
               } catch (error) {
-                console.error(`Error checking like for post ${post.id}:`, error);
+                console.error(
+                  `Error checking like for post ${post.id}:`,
+                  error
+                );
                 likeStatuses[post.id] = false;
               }
             })
@@ -65,19 +71,15 @@ const HomeScreen = ({ navigation }) => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [filter, currentUserId]);
 
   useEffect(() => {
     fetchPosts();
-  }, [filter]);
+  }, [fetchPosts]);
 
   const onRefresh = () => {
     setRefreshing(true);
     fetchPosts();
-  };
-
-  const handlePostPress = (post) => {
-    // Removed - clicking card no longer navigates
   };
 
   const handleCommentPress = (post) => {
@@ -126,7 +128,7 @@ const HomeScreen = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#f4511e" />
+        <ActivityIndicator size="large" color={COLORS.primary} />
       </View>
     );
   }
@@ -171,7 +173,8 @@ const HomeScreen = ({ navigation }) => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#f4511e"]}
+            colors={[COLORS.primary]}
+            tintColor={COLORS.primary}
           />
         }
         ListEmptyComponent={

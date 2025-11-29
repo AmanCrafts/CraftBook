@@ -9,7 +9,7 @@ import postService from "./post.service.js";
  * Create a new post
  * POST /api/posts
  */
-export async function createPost(req, res, next) {
+export async function createPost(req, res, _next) {
   try {
     const post = await postService.createPost(req.body);
     res.status(201).json(post);
@@ -26,7 +26,7 @@ export async function createPost(req, res, next) {
  * Get post by ID
  * GET /api/posts/:id
  */
-export async function getPostById(req, res, next) {
+export async function getPostById(req, res, _next) {
   try {
     const { id } = req.params;
     const post = await postService.getPostById(id);
@@ -44,7 +44,7 @@ export async function getPostById(req, res, next) {
  * Get all posts
  * GET /api/posts
  */
-export async function getAllPosts(req, res, next) {
+export async function getAllPosts(_req, res, _next) {
   try {
     const posts = await postService.getAllPosts();
     res.status(200).json(posts);
@@ -61,7 +61,7 @@ export async function getAllPosts(req, res, next) {
  * Get posts by user ID
  * GET /api/posts/user/:userId
  */
-export async function getPostsByUserId(req, res, next) {
+export async function getPostsByUserId(req, res, _next) {
   try {
     const { userId } = req.params;
     const posts = await postService.getPostsByUserId(userId);
@@ -79,7 +79,7 @@ export async function getPostsByUserId(req, res, next) {
  * Search posts by tag
  * GET /api/posts/tag/:tag
  */
-export async function searchPostsByTag(req, res, next) {
+export async function searchPostsByTag(req, res, _next) {
   try {
     const { tag } = req.params;
     const posts = await postService.searchPostsByTag(tag);
@@ -97,7 +97,7 @@ export async function searchPostsByTag(req, res, next) {
  * Get posts by medium
  * GET /api/posts/medium/:medium
  */
-export async function getPostsByMedium(req, res, next) {
+export async function getPostsByMedium(req, res, _next) {
   try {
     const { medium } = req.params;
     const posts = await postService.getPostsByMedium(medium);
@@ -115,7 +115,7 @@ export async function getPostsByMedium(req, res, next) {
  * Get posts by tag and medium
  * GET /api/posts/tag/:tag/medium/:medium
  */
-export async function getPostsByTagAndMedium(req, res, next) {
+export async function getPostsByTagAndMedium(req, res, _next) {
   try {
     const { tag, medium } = req.params;
     const posts = await postService.getPostsByTagAndMedium(tag, medium);
@@ -133,7 +133,7 @@ export async function getPostsByTagAndMedium(req, res, next) {
  * Search posts by title
  * GET /api/posts/search/title/:title
  */
-export async function searchPostsByTitle(req, res, next) {
+export async function searchPostsByTitle(req, res, _next) {
   try {
     const { title } = req.params;
     const posts = await postService.searchPostsByTitle(title);
@@ -151,7 +151,7 @@ export async function searchPostsByTitle(req, res, next) {
  * Search posts by description
  * GET /api/posts/search/description/:description
  */
-export async function searchPostsByDescription(req, res, next) {
+export async function searchPostsByDescription(req, res, _next) {
   try {
     const { description } = req.params;
     const posts = await postService.searchPostsByDescription(description);
@@ -169,7 +169,7 @@ export async function searchPostsByDescription(req, res, next) {
  * Get recent posts
  * GET /api/posts/recent
  */
-export async function getRecentPosts(req, res, next) {
+export async function getRecentPosts(_req, res, _next) {
   try {
     const posts = await postService.getRecentPosts();
     res.status(200).json(posts);
@@ -186,7 +186,7 @@ export async function getRecentPosts(req, res, next) {
  * Get popular posts
  * GET /api/posts/popular
  */
-export async function getPopularPosts(req, res, next) {
+export async function getPopularPosts(_req, res, _next) {
   try {
     const posts = await postService.getPopularPosts();
     res.status(200).json(posts);
@@ -203,7 +203,7 @@ export async function getPopularPosts(req, res, next) {
  * Get process posts
  * GET /api/posts/process
  */
-export async function getProcessPosts(req, res, next) {
+export async function getProcessPosts(_req, res, _next) {
   try {
     const posts = await postService.getProcessPosts();
     res.status(200).json(posts);
@@ -220,7 +220,7 @@ export async function getProcessPosts(req, res, next) {
  * Update post
  * PUT /api/posts/:id
  */
-export async function updatePost(req, res, next) {
+export async function updatePost(req, res, _next) {
   try {
     const { id } = req.params;
     const post = await postService.updatePost(id, req.body);
@@ -238,7 +238,7 @@ export async function updatePost(req, res, next) {
  * Delete post
  * DELETE /api/posts/:id
  */
-export async function deletePost(req, res, next) {
+export async function deletePost(req, res, _next) {
   try {
     const { id } = req.params;
     await postService.deletePost(id);

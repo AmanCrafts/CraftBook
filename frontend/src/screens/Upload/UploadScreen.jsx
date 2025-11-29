@@ -1,16 +1,17 @@
+import { getAuth } from "firebase/auth";
 import { useState } from "react";
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
-  StyleSheet,
   TouchableOpacity,
-  ScrollView,
-  Alert,
-  ActivityIndicator,
+  View,
 } from "react-native";
-import { getAuth } from "firebase/auth";
 import ImageCropPicker from "../../components/common/ImageCropPicker";
+import COLORS from "../../constants/colors";
 
 const UploadScreen = ({ navigation }) => {
   const [image, setImage] = useState(null);
@@ -63,7 +64,7 @@ const UploadScreen = ({ navigation }) => {
 
       // Get user from backend
       const userResponse = await fetch(
-        `${API_URL}/api/users/google/${user.uid}`,
+        `${API_URL}/api/users/google/${user.uid}`
       );
       const userData = await userResponse.json();
 
@@ -154,7 +155,7 @@ const UploadScreen = ({ navigation }) => {
       console.error("Upload error:", error);
       Alert.alert(
         "Error",
-        "An error occurred while uploading: " + error.message,
+        `An error occurred while uploading: ${error.message}`
       );
     } finally {
       setLoading(false);
@@ -171,10 +172,7 @@ const UploadScreen = ({ navigation }) => {
       <View style={styles.content}>
         {/* Image Picker with Crop */}
         <View style={styles.imageSection}>
-          <ImageCropPicker
-            onImageSelected={setImage}
-            currentImage={image}
-          />
+          <ImageCropPicker onImageSelected={setImage} currentImage={image} />
         </View>
 
         {/* Form Fields */}
@@ -238,7 +236,7 @@ const UploadScreen = ({ navigation }) => {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={COLORS.white} />
             ) : (
               <Text style={styles.uploadButtonText}>Post Artwork</Text>
             )}
@@ -252,24 +250,24 @@ const UploadScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: COLORS.background,
   },
   header: {
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
     paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+    borderBottomColor: COLORS.gray200,
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#f4511e",
+    color: COLORS.primary,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: "#666",
+    color: COLORS.textSecondary,
     marginTop: 5,
   },
   content: {
@@ -279,17 +277,17 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   imagePlaceholder: {
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
     borderRadius: 12,
     padding: 40,
     alignItems: "center",
     borderWidth: 2,
-    borderColor: "#e0e0e0",
+    borderColor: COLORS.gray200,
     borderStyle: "dashed",
   },
   placeholderText: {
     fontSize: 16,
-    color: "#999",
+    color: COLORS.textTertiary,
     marginBottom: 20,
   },
   buttonRow: {
@@ -297,13 +295,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   pickButton: {
-    backgroundColor: "#f4511e",
+    backgroundColor: COLORS.primary,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
   },
   pickButtonText: {
-    color: "#fff",
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: "600",
   },
@@ -327,29 +325,29 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   changeImageText: {
-    color: "#fff",
+    color: COLORS.white,
     fontSize: 14,
     fontWeight: "600",
   },
   form: {
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
     borderRadius: 12,
     padding: 20,
   },
   label: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#333",
+    color: COLORS.text,
     marginBottom: 8,
     marginTop: 15,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: COLORS.gray200,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: COLORS.gray100,
   },
   textArea: {
     height: 100,
@@ -365,24 +363,24 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: COLORS.gray100,
     borderWidth: 1,
-    borderColor: "#e0e0e0",
+    borderColor: COLORS.gray200,
   },
   mediumChipActive: {
-    backgroundColor: "#f4511e",
-    borderColor: "#f4511e",
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
   },
   mediumChipText: {
     fontSize: 14,
-    color: "#666",
+    color: COLORS.textSecondary,
     fontWeight: "500",
   },
   mediumChipTextActive: {
-    color: "#fff",
+    color: COLORS.white,
   },
   uploadButton: {
-    backgroundColor: "#f4511e",
+    backgroundColor: COLORS.primary,
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: "center",
@@ -392,7 +390,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   uploadButtonText: {
-    color: "#fff",
+    color: COLORS.white,
     fontSize: 18,
     fontWeight: "bold",
   },

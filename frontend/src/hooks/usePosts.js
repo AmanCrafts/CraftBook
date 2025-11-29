@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import postAPI from "../api/post.api";
 
 // Fetch and manage posts with filter (recent/popular)
@@ -7,7 +7,7 @@ export const usePosts = (filter = "recent") => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -17,7 +17,6 @@ export const usePosts = (filter = "recent") => {
         case "popular":
           data = await postAPI.getPopularPosts();
           break;
-        case "recent":
         default:
           data = await postAPI.getRecentPosts();
           break;
@@ -30,11 +29,11 @@ export const usePosts = (filter = "recent") => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
 
   useEffect(() => {
     fetchPosts();
-  }, [filter]);
+  }, [fetchPosts]);
 
   return { posts, loading, error, refetch: fetchPosts };
 };
@@ -45,7 +44,7 @@ export const usePost = (postId) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchPost = async () => {
+  const fetchPost = useCallback(async () => {
     if (!postId) return;
 
     try {
@@ -59,11 +58,11 @@ export const usePost = (postId) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [postId]);
 
   useEffect(() => {
     fetchPost();
-  }, [postId]);
+  }, [fetchPost]);
 
   return { post, loading, error, refetch: fetchPost };
 };

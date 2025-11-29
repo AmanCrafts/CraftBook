@@ -1,7 +1,6 @@
-import React from "react";
-import { View, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import COLORS from "../../constants/colors";
 
 // Profile Header Component with Banner and Avatar

@@ -1,9 +1,9 @@
 import express from "express";
-import userRoutes from "../../modules/user/user.routes.js";
+import commentRoutes from "../../modules/comment/comment.routes.js";
+import likeRoutes from "../../modules/like/like.routes.js";
 import postRoutes from "../../modules/post/post.routes.js";
 import uploadRoutes from "../../modules/upload/upload.routes.js";
-import likeRoutes from "../../modules/like/like.routes.js";
-import commentRoutes from "../../modules/comment/comment.routes.js";
+import userRoutes from "../../modules/user/user.routes.js";
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ const router = express.Router();
  */
 
 // Health check
-router.get("/health", (req, res) => {
+router.get("/health", (_req, res) => {
   res.status(200).json({
     status: "ok",
     message: "CraftBook API is running",

@@ -2,7 +2,7 @@
  * Error Handler Middleware
  * Catches and formats errors
  */
-export const errorHandler = (err, req, res, next) => {
+export const errorHandler = (err, _req, res, _next) => {
   console.error("Error:", err);
 
   // Multer errors
@@ -53,7 +53,7 @@ export const errorHandler = (err, req, res, next) => {
 /**
  * 404 Not Found Handler
  */
-export const notFoundHandler = (req, res, next) => {
+export const notFoundHandler = (req, res, _next) => {
   res.status(404).json({
     error: "Route not found",
     path: req.originalUrl,

@@ -9,7 +9,7 @@ import userService from "./user.service.js";
  * Create a new user
  * POST /api/users
  */
-export async function createUser(req, res, next) {
+export async function createUser(req, res, _next) {
   try {
     if (!req.body) {
       return res.status(400).json({ error: "Request body is required" });
@@ -30,7 +30,7 @@ export async function createUser(req, res, next) {
  * Get user by ID
  * GET /api/users/:id
  */
-export async function getUserById(req, res, next) {
+export async function getUserById(req, res, _next) {
   try {
     const { id } = req.params;
     const user = await userService.getUserById(id);
@@ -48,7 +48,7 @@ export async function getUserById(req, res, next) {
  * Get user by Google ID
  * GET /api/users/google/:googleId
  */
-export async function getUserByGoogleId(req, res, next) {
+export async function getUserByGoogleId(req, res, _next) {
   try {
     const { googleId } = req.params;
     const user = await userService.getUserByGoogleId(googleId);
@@ -66,7 +66,7 @@ export async function getUserByGoogleId(req, res, next) {
  * Get all users
  * GET /api/users
  */
-export async function getAllUsers(req, res, next) {
+export async function getAllUsers(_req, res, _next) {
   try {
     const users = await userService.getAllUsers();
     res.status(200).json(users);
@@ -83,7 +83,7 @@ export async function getAllUsers(req, res, next) {
  * Update user
  * PUT /api/users/:id
  */
-export async function updateUser(req, res, next) {
+export async function updateUser(req, res, _next) {
   try {
     const { id } = req.params;
     const user = await userService.updateUser(id, req.body);
@@ -101,7 +101,7 @@ export async function updateUser(req, res, next) {
  * Delete user
  * DELETE /api/users/:id
  */
-export async function deleteUser(req, res, next) {
+export async function deleteUser(req, res, _next) {
   try {
     const { id } = req.params;
     await userService.deleteUser(id);

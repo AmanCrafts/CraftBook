@@ -1,12 +1,12 @@
-import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
   ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import COLORS from "../../constants/colors";
 
 // Reusable Button Component with modern design
 const Button = ({
@@ -87,12 +87,12 @@ const Button = ({
       case "primary":
       case "secondary":
       case "danger":
-        return "#ffffff";
+        return COLORS.white;
       case "outline":
       case "ghost":
-        return "#6366f1";
+        return COLORS.primary;
       default:
-        return "#ffffff";
+        return COLORS.white;
     }
   };
 
@@ -168,16 +168,16 @@ const styles = StyleSheet.create({
 
   // Variants
   primary: {
-    backgroundColor: "#6366f1",
-    shadowColor: "#6366f1",
+    backgroundColor: COLORS.primary,
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
   },
   secondary: {
-    backgroundColor: "#10b981",
-    shadowColor: "#10b981",
+    backgroundColor: COLORS.secondary,
+    shadowColor: COLORS.secondary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -186,14 +186,14 @@ const styles = StyleSheet.create({
   outline: {
     backgroundColor: "transparent",
     borderWidth: 2,
-    borderColor: "#6366f1",
+    borderColor: COLORS.primary,
   },
   ghost: {
     backgroundColor: "transparent",
   },
   danger: {
-    backgroundColor: "#ef4444",
-    shadowColor: "#ef4444",
+    backgroundColor: COLORS.error,
+    shadowColor: COLORS.error,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -217,19 +217,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   primaryText: {
-    color: "#ffffff",
+    color: COLORS.white,
   },
   secondaryText: {
-    color: "#ffffff",
+    color: COLORS.white,
   },
   outlineText: {
-    color: "#6366f1",
+    color: COLORS.primary,
   },
   ghostText: {
-    color: "#6366f1",
+    color: COLORS.primary,
   },
   dangerText: {
-    color: "#ffffff",
+    color: COLORS.white,
   },
 
   // Icons

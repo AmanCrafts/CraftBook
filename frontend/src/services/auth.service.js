@@ -1,4 +1,4 @@
-import { getAuth, signOut as firebaseSignOut } from "firebase/auth";
+import { signOut as firebaseSignOut, getAuth } from "firebase/auth";
 import userAPI from "../api/user.api";
 
 // Authentication service - handles auth-related business logic
@@ -27,7 +27,7 @@ export async function hasCompletedProfile(googleId) {
   try {
     const user = await userAPI.getUserByGoogleId(googleId);
     return !!user;
-  } catch (error) {
+  } catch {
     return false;
   }
 }

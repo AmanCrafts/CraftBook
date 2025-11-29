@@ -1,24 +1,24 @@
-import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import {
-  View,
-  Text,
-  StyleSheet,
+  createUserWithEmailAndPassword,
+  getAuth,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { useState } from "react";
+import {
   Alert,
-  TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-} from "firebase/auth";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import Input from "./Input";
-import Button from "./Button";
 import COLORS from "../../constants/colors";
+import Button from "./Button";
+import Input from "./Input";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -40,13 +40,13 @@ const Login = ({ navigation }) => {
         userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
-          password,
+          password
         );
       } else {
         userCredential = await signInWithEmailAndPassword(
           auth,
           email,
-          password,
+          password
         );
       }
 
@@ -67,7 +67,7 @@ const Login = ({ navigation }) => {
         // Existing user login, check if profile exists
         try {
           const response = await fetch(
-            `${process.env.EXPO_PUBLIC_API_URL}/api/users/google/${user.uid}`,
+            `${process.env.EXPO_PUBLIC_API_URL}/api/users/google/${user.uid}`
           );
           if (response.ok) {
             const userData = await response.json();
@@ -85,7 +85,7 @@ const Login = ({ navigation }) => {
               },
             });
           }
-        } catch (error) {
+        } catch {
           console.log("User profile not found, going to profile completion");
           navigation.navigate("CompleteProfile", {
             googleUser: {

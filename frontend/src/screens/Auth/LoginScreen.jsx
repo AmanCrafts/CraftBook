@@ -1,8 +1,7 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
-
+import { StyleSheet, View } from "react-native";
 import Login from "../../components/common/Login";
 import Register from "../../components/common/Register";
+import COLORS from "../../constants/colors";
 
 const LoginScreen = ({ navigation }) => {
   return (
@@ -16,7 +15,7 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
   },
 });
 

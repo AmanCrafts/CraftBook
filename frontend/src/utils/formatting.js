@@ -76,5 +76,5 @@ export const formatNumber = (num) => {
 // Truncate text with ellipsis
 export const truncateText = (text, maxLength = 50) => {
   if (!text || text.length <= maxLength) return text;
-  return text.substring(0, maxLength) + "...";
+  return `${text.substring(0, maxLength)}...`;
 };

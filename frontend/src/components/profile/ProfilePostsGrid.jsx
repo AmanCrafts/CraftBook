@@ -1,13 +1,12 @@
-import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
-  View,
-  Text,
   FlatList,
   Image,
   StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
 
 // Profile Posts Grid Component
@@ -15,7 +14,7 @@ const ProfilePostsGrid = ({ posts, onPostPress, onUploadPress }) => {
   const renderPost = ({ item }) => (
     <TouchableOpacity
       style={styles.postItem}
-      onPress={() => onPostPress && onPostPress(item)}
+      onPress={() => onPostPress?.(item)}
       activeOpacity={0.8}
     >
       <Image

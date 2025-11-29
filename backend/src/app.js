@@ -1,12 +1,12 @@
-import express from "express";
 import cors from "cors";
-import config from "./config/index.js";
+import express from "express";
 import apiV1Routes from "./api/v1/index.js";
-import { requestLogger } from "./middlewares/logger.middleware.js";
+import config from "./config/index.js";
 import {
   errorHandler,
   notFoundHandler,
 } from "./middlewares/error.middleware.js";
+import { requestLogger } from "./middlewares/logger.middleware.js";
 
 /**
  * Initialize Express Application
@@ -34,7 +34,7 @@ if (config.nodeEnv === "development") {
  */
 
 // Root endpoint
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.status(200).json({
     message: "CraftBook API Server",
     version: "1.0.0",

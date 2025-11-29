@@ -1,20 +1,20 @@
-import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   Alert,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "../../contexts/AuthContext";
 import userAPI from "../../api/user.api";
-import Input from "../../components/common/Input";
 import Button from "../../components/common/Button";
+import Input from "../../components/common/Input";
 import COLORS from "../../constants/colors";
+import { useAuth } from "../../contexts/AuthContext";
 
 const CompleteProfileScreen = ({ route, navigation }) => {
   const { user: firebaseUser, setDbUser } = useAuth();

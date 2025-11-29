@@ -4,7 +4,7 @@ import multer from "multer";
 const storage = multer.memoryStorage();
 
 // File filter for images only
-const fileFilter = (req, file, cb) => {
+const fileFilter = (_req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {

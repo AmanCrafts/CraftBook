@@ -1,6 +1,6 @@
-import { supabase } from "../../config/supabase.js";
 import { prisma } from "../../config/database.js";
 import config from "../../config/index.js";
+import { supabase } from "../../config/supabase.js";
 
 /**
  * Upload Service - Business Logic Layer
@@ -20,7 +20,7 @@ export async function uploadImage(file) {
 
   try {
     // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from(bucketName)
       .upload(fileName, file.buffer, {
         contentType: file.mimetype,

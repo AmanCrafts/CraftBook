@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  ActivityIndicator,
-  TouchableOpacity,
-  Share,
-} from "react-native";
-import { getAuth, signOut } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import ProfileHeader from "../../components/profile/ProfileHeader";
-import ProfileInfo from "../../components/profile/ProfileInfo";
-import ProfileStats from "../../components/profile/ProfileStats";
-import ProfileActions from "../../components/profile/ProfileActions";
-import ProfilePostsGrid from "../../components/profile/ProfilePostsGrid";
-import EditProfileModal from "../../components/profile/EditProfileModal";
+import { getAuth, signOut } from "firebase/auth";
+import { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  Share,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import postAPI from "../../api/post.api";
 import uploadAPI from "../../api/upload.api";
 import userAPI from "../../api/user.api";
-import postAPI from "../../api/post.api";
+import EditProfileModal from "../../components/profile/EditProfileModal";
+import ProfileActions from "../../components/profile/ProfileActions";
+import ProfileHeader from "../../components/profile/ProfileHeader";
+import ProfileInfo from "../../components/profile/ProfileInfo";
+import ProfilePostsGrid from "../../components/profile/ProfilePostsGrid";
+import ProfileStats from "../../components/profile/ProfileStats";
 import COLORS from "../../constants/colors";
 
 const ProfileScreen = ({ navigation }) => {
@@ -36,12 +36,7 @@ const ProfileScreen = ({ navigation }) => {
   });
   const auth = getAuth();
 
-  useEffect(() => {
-    loadUserProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const loadUserProfile = async () => {
+  const loadUserProfile = useCallback(async () => {
     try {
       const currentUser = auth.currentUser;
       if (!currentUser) {
@@ -66,7 +61,11 @@ const ProfileScreen = ({ navigation }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [auth, navigation]);
+
+  useEffect(() => {
+    loadUserProfile();
+  }, [loadUserProfile]);
 
   const pickAvatar = async () => {
     try {
@@ -76,7 +75,7 @@ const ProfileScreen = ({ navigation }) => {
       if (permissionResult.granted === false) {
         Alert.alert(
           "Permission Required",
-          "Please allow access to your photo library",
+          "Please allow access to your photo library"
         );
         return;
       }
@@ -92,7 +91,7 @@ const ProfileScreen = ({ navigation }) => {
         setUploadingImage(true);
         try {
           const uploadResult = await uploadAPI.uploadImage(
-            result.assets[0].uri,
+            result.assets[0].uri
           );
           await userAPI.updateUser(user.id, {
             profilePicture: uploadResult.image.url,
@@ -123,7 +122,7 @@ const ProfileScreen = ({ navigation }) => {
       if (permissionResult.granted === false) {
         Alert.alert(
           "Permission Required",
-          "Please allow access to your photo library",
+          "Please allow access to your photo library"
         );
         return;
       }
@@ -139,7 +138,7 @@ const ProfileScreen = ({ navigation }) => {
         setUploadingImage(true);
         try {
           const uploadResult = await uploadAPI.uploadImage(
-            result.assets[0].uri,
+            result.assets[0].uri
           );
           await userAPI.updateUser(user.id, {
             bannerImage: uploadResult.image.url,
@@ -265,7 +264,9 @@ const ProfileScreen = ({ navigation }) => {
 
         <ProfilePostsGrid
           posts={posts}
-          onPostPress={(post) => navigation.navigate("PostDetail", { postId: post.id })}
+          onPostPress={(post) =>
+            navigation.navigate("PostDetail", { postId: post.id })
+          }
           onUploadPress={() => navigation.navigate("Upload")}
         />
       </ScrollView>
@@ -324,7 +325,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   buttonText: {
-    color: "#fff",
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: "600",
   },
@@ -338,7 +339,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,

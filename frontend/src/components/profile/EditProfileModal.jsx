@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Modal,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
-} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
-import Input from "../common/Input";
-import Button from "../common/Button";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import COLORS from "../../constants/colors";
+import Button from "../common/Button";
+import Input from "../common/Input";
 
 // Edit Profile Modal Component
 const EditProfileModal = ({ visible, user, onClose, onSave }) => {
@@ -46,7 +44,7 @@ const EditProfileModal = ({ visible, user, onClose, onSave }) => {
         medium: medium.trim(),
       });
       onClose();
-    } catch (error) {
+    } catch {
       Alert.alert("Error", "Failed to update profile");
     } finally {
       setLoading(false);

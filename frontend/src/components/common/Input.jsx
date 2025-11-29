@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import {
-  View,
-  TextInput,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import COLORS from "../../constants/colors";
 
 // Reusable Input Component with modern design
 const Input = ({
@@ -46,7 +47,7 @@ const Input = ({
           <Ionicons
             name={icon}
             size={20}
-            color={isFocused ? "#6366f1" : "#9ca3af"}
+            color={isFocused ? COLORS.primary : COLORS.textTertiary}
             style={styles.icon}
           />
         )}
@@ -55,7 +56,7 @@ const Input = ({
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="#9ca3af"
+          placeholderTextColor={COLORS.textTertiary}
           secureTextEntry={isPassword && !isPasswordVisible}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
@@ -74,7 +75,7 @@ const Input = ({
             <Ionicons
               name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
               size={20}
-              color="#9ca3af"
+              color={COLORS.textTertiary}
             />
           </TouchableOpacity>
         )}
@@ -91,28 +92,28 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#374151",
+    color: COLORS.text,
     marginBottom: 8,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f9fafb",
+    backgroundColor: COLORS.gray50,
     borderWidth: 1.5,
-    borderColor: "#e5e7eb",
+    borderColor: COLORS.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     minHeight: 50,
   },
   inputContainerFocused: {
-    borderColor: "#6366f1",
-    backgroundColor: "#ffffff",
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.white,
   },
   inputContainerError: {
-    borderColor: "#ef4444",
+    borderColor: COLORS.error,
   },
   inputContainerDisabled: {
-    backgroundColor: "#f3f4f6",
+    backgroundColor: COLORS.gray100,
     opacity: 0.6,
   },
   icon: {
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: "#111827",
+    color: COLORS.text,
     paddingVertical: 12,
   },
   multilineInput: {
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    color: "#ef4444",
+    color: COLORS.error,
     marginTop: 4,
     marginLeft: 4,
   },

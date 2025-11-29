@@ -1,6 +1,6 @@
 import app from "./app.js";
-import config from "./config/index.js";
 import database from "./config/database.js";
+import config from "./config/index.js";
 
 /**
  * Server Configuration

@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import COLORS from "../../constants/colors";
 
 const Register = () => {
   return (
@@ -21,13 +21,13 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 14,
-    color: "#666",
+    color: COLORS.textSecondary,
     textAlign: "center",
     marginBottom: 10,
   },
   subtext: {
     fontSize: 12,
-    color: "#999",
+    color: COLORS.textTertiary,
     textAlign: "center",
     fontStyle: "italic",
   },

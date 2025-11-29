@@ -10,7 +10,12 @@
     "test": "node test-db-connection.js",
     "prisma:migrate": "prisma migrate dev --schema=./prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
-    "prisma:studio": "prisma studio --schema=./prisma/schema.prisma"
+    "prisma:studio": "prisma studio --schema=./prisma/schema.prisma",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write ."
   },
   "keywords": [
     "express",
@@ -21,6 +26,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@biomejs/biome": "2.3.8",
     "nodemon": "^3.1.10"
   },
   "dependencies": {
@@ -31,6 +37,7 @@
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "multer": "^2.0.2",
+    "prettier": "^3.7.2",
     "prisma": "^6.16.3"
   },
   "private": true

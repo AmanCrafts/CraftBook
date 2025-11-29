@@ -9,7 +9,7 @@ async function testConnection() {
 
     // Try a simple query
     const userCount = await prisma.user.count();
-    console.log(`📊 Total users in database: ${userCount}`);
+    console.log(`[INFO] Total users in database: ${userCount}`);
 
     await prisma.$disconnect();
     process.exit(0);

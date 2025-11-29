@@ -21,12 +21,12 @@ async function request(endpoint, options = {}) {
 
   try {
     const response = await fetch(url, config);
-    
+
     // Handle 204 No Content responses
     if (response.status === 204) {
       return null;
     }
-    
+
     const data = await response.json();
 
     if (!response.ok) {
@@ -76,11 +76,11 @@ export function deleteRequest(endpoint, body = null, options = {}) {
     ...options,
     method: "DELETE",
   };
-  
+
   if (body) {
     config.body = JSON.stringify(body);
   }
-  
+
   return request(endpoint, config);
 }
 

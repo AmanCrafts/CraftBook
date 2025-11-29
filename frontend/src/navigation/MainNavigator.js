@@ -1,13 +1,12 @@
-import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import ROUTES from "../constants/routes";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import COLORS from "../constants/colors";
+import ROUTES from "../constants/routes";
 
 // Import screens
 import HomeScreen from "../screens/Home/HomeScreen";
-import UploadScreen from "../screens/Upload/UploadScreen";
 import ProfileScreen from "../screens/Profile/ProfileScreen";
+import UploadScreen from "../screens/Upload/UploadScreen";
 
 const Tab = createBottomTabNavigator();
 

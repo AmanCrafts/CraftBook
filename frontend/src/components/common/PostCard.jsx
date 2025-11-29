@@ -1,6 +1,13 @@
-import { useState, useEffect } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useState } from "react";
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import COLORS from "../../constants/colors";
 import LikeButton from "./LikeButton";
 
@@ -28,13 +35,12 @@ const PostCard = ({ post, onPress, onCommentPress, userId, initialLiked }) => {
           setImageHeight(finalHeight);
         },
         (error) => {
-          console.log("Error getting image size:", error);
-          setImageHeight(300); // fallback to default
+          console.error("Error getting image size:", error);
+          setImageHeight(300);
         }
       );
     }
   }, [post.imageUrl]);
-
   return (
     <View style={styles.card}>
       <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
@@ -50,7 +56,8 @@ const PostCard = ({ post, onPress, onCommentPress, userId, initialLiked }) => {
             <Image
               source={{
                 uri:
-                  post.author?.profilePicture || "https://via.placeholder.com/40",
+                  post.author?.profilePicture ||
+                  "https://via.placeholder.com/40",
               }}
               style={styles.avatar}
             />
@@ -91,7 +98,9 @@ const PostCard = ({ post, onPress, onCommentPress, userId, initialLiked }) => {
                 size={20}
                 color={COLORS.primary}
               />
-              <Text style={styles.actionText}>{post._count?.comments || 0}</Text>
+              <Text style={styles.actionText}>
+                {post._count?.comments || 0}
+              </Text>
             </TouchableOpacity>
           </View>
           <Text style={styles.timeAgo}>
@@ -108,7 +117,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     marginBottom: 20,
     borderRadius: 12,
-    shadowColor: "#000",
+    shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,

@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { createContext, useContext, useEffect, useState } from "react";
 import userAPI from "../api/user.api";
 
 const AuthContext = createContext({});
@@ -14,29 +14,34 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Subscribe to Firebase auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
-        setIsAuthenticated(true);
+      try {
+        if (firebaseUser) {
+          setUser(firebaseUser);
+          setIsAuthenticated(true);
 
-        // Fetch user profile from database
-        try {
-          const userData = await userAPI.getUserByGoogleId(firebaseUser.uid);
-          setDbUser(userData);
-        } catch (error) {
-          console.log("User profile not found in database:", error);
+          // Fetch user profile from database
+          try {
+            const userData = await userAPI.getUserByGoogleId(firebaseUser.uid);
+            setDbUser(userData);
+          } catch (error) {
+            console.error("User profile not found in database:", error);
+            setDbUser(null);
+          }
+        } else {
+          setUser(null);
           setDbUser(null);
+          setIsAuthenticated(false);
         }
-      } else {
-        setUser(null);
-        setDbUser(null);
-        setIsAuthenticated(false);
+      } catch (error) {
+        console.error("Error in auth state change:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     // Cleanup subscription
     return unsubscribe;
-  }, []);
+  }, [auth]);
 
   const value = {
     user,

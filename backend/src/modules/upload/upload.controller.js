@@ -9,7 +9,7 @@ import uploadService from "./upload.service.js";
  * Upload image
  * POST /api/upload
  */
-export async function uploadImage(req, res, next) {
+export async function uploadImage(req, res, _next) {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -30,7 +30,7 @@ export async function uploadImage(req, res, next) {
  * Delete image
  * DELETE /api/upload/:id
  */
-export async function deleteImage(req, res, next) {
+export async function deleteImage(req, res, _next) {
   try {
     const { id } = req.params;
     const result = await uploadService.deleteImage(id);
