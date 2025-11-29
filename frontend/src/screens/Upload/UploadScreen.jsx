@@ -1,17 +1,16 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  Image,
   ScrollView,
   Alert,
   ActivityIndicator,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import { getAuth } from "firebase/auth";
+import ImageCropPicker from "../../components/common/ImageCropPicker";
 
 const UploadScreen = ({ navigation }) => {
   const [image, setImage] = useState(null);
@@ -33,51 +32,6 @@ const UploadScreen = ({ navigation }) => {
     "Mixed Media",
     "Other",
   ];
-
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (status !== "granted") {
-      Alert.alert(
-        "Permission needed",
-        "Please grant camera roll permissions to upload images.",
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
-
-  const takePhoto = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-
-    if (status !== "granted") {
-      Alert.alert(
-        "Permission needed",
-        "Please grant camera permissions to take photos.",
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
 
   const handleUpload = async () => {
     if (!image) {
@@ -215,31 +169,12 @@ const UploadScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.content}>
-        {/* Image Picker */}
+        {/* Image Picker with Crop */}
         <View style={styles.imageSection}>
-          {image ? (
-            <TouchableOpacity onPress={pickImage} style={styles.imagePreview}>
-              <Image source={{ uri: image }} style={styles.image} />
-              <TouchableOpacity
-                style={styles.changeImageButton}
-                onPress={pickImage}
-              >
-                <Text style={styles.changeImageText}>Change Image</Text>
-              </TouchableOpacity>
-            </TouchableOpacity>
-          ) : (
-            <View style={styles.imagePlaceholder}>
-              <Text style={styles.placeholderText}>No image selected</Text>
-              <View style={styles.buttonRow}>
-                <TouchableOpacity style={styles.pickButton} onPress={pickImage}>
-                  <Text style={styles.pickButtonText}>Gallery</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.pickButton} onPress={takePhoto}>
-                  <Text style={styles.pickButtonText}>Camera</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
+          <ImageCropPicker
+            onImageSelected={setImage}
+            currentImage={image}
+          />
         </View>
 
         {/* Form Fields */}
