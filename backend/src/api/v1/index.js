@@ -22,6 +22,7 @@ router.get("/health", (req, res) => {
 });
 
 // Mount module routes
+
 router.use("/users", userRoutes);
 router.use("/posts", postRoutes);
 router.use("/posts", likeRoutes);

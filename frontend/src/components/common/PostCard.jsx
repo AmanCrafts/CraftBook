@@ -20,13 +20,13 @@ const PostCard = ({ post, onPress, onCommentPress, userId, initialLiked }) => {
             <Image
               source={{
                 uri:
-                  post.user?.profilePicture || "https://via.placeholder.com/40",
+                  post.author?.profilePicture || "https://via.placeholder.com/40",
               }}
               style={styles.avatar}
             />
             <View>
               <Text style={styles.artistName}>
-                {post.user?.name || "Artist"}
+                {post.author?.name || "Artist"}
               </Text>
               <Text style={styles.medium}>{post.medium || "Mixed Media"}</Text>
             </View>
