@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
     View,
     Text,
-    FlatList,
     TextInput,
     TouchableOpacity,
     StyleSheet,
@@ -121,59 +120,63 @@ const CommentSection = ({ postId, currentUserId, currentUserName }) => {
     }
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={styles.container}
-        >
+        <View style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.title}>
                     Comments {comments.length > 0 && `(${comments.length})`}
                 </Text>
             </View>
 
-            {comments.length === 0 ? (
-                <View style={styles.emptyContainer}>
-                    <Ionicons
-                        name="chatbubble-outline"
-                        size={48}
-                        color={COLORS.textTertiary}
-                    />
-                    <Text style={styles.emptyText}>No comments yet</Text>
-                    <Text style={styles.emptySubtext}>Be the first to comment!</Text>
-                </View>
-            ) : (
-                <FlatList
-                    data={comments}
-                    keyExtractor={(item) => item.id}
-                    renderItem={renderComment}
-                    contentContainerStyle={styles.commentsList}
-                    showsVerticalScrollIndicator={false}
-                />
-            )}
-
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Add a comment..."
-                    value={newComment}
-                    onChangeText={setNewComment}
-                    multiline
-                    maxLength={500}
-                    editable={!sending}
-                />
-                <TouchableOpacity
-                    style={[styles.sendButton, !newComment.trim() && styles.sendButtonDisabled]}
-                    onPress={handleSendComment}
-                    disabled={!newComment.trim() || sending}
-                >
-                    {sending ? (
-                        <ActivityIndicator size="small" color={COLORS.white} />
-                    ) : (
-                        <Ionicons name="send" size={20} color={COLORS.white} />
-                    )}
-                </TouchableOpacity>
+            <View style={styles.commentsScrollContainer}>
+                {comments.length === 0 ? (
+                    <View style={styles.emptyContainer}>
+                        <Ionicons
+                            name="chatbubble-outline"
+                            size={48}
+                            color={COLORS.textTertiary}
+                        />
+                        <Text style={styles.emptyText}>No comments yet</Text>
+                        <Text style={styles.emptySubtext}>Be the first to comment!</Text>
+                    </View>
+                ) : (
+                    <View style={styles.commentsList}>
+                        {comments.map((item) => (
+                            <View key={item.id}>
+                                {renderComment({ item })}
+                            </View>
+                        ))}
+                    </View>
+                )}
             </View>
-        </KeyboardAvoidingView>
+
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+            >
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Add a comment..."
+                        value={newComment}
+                        onChangeText={setNewComment}
+                        multiline
+                        maxLength={500}
+                        editable={!sending}
+                    />
+                    <TouchableOpacity
+                        style={[styles.sendButton, !newComment.trim() && styles.sendButtonDisabled]}
+                        onPress={handleSendComment}
+                        disabled={!newComment.trim() || sending}
+                    >
+                        {sending ? (
+                            <ActivityIndicator size="small" color={COLORS.white} />
+                        ) : (
+                            <Ionicons name="send" size={20} color={COLORS.white} />
+                        )}
+                    </TouchableOpacity>
+                </View>
+            </KeyboardAvoidingView>
+        </View>
     );
 };
 
@@ -196,6 +199,9 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "700",
         color: COLORS.text,
+    },
+    commentsScrollContainer: {
+        flex: 1,
     },
     commentsList: {
         paddingHorizontal: 20,

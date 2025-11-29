@@ -18,7 +18,7 @@ export const commentAPI = {
 
 	// Update a comment
 	updateComment: async (commentId, content, userId) => {
-		return await httpClient.put(`/api/comments/${commentId}`, {
+		return await httpClient.put(`${API_BASE}/comments/${commentId}`, {
 			content,
 			userId,
 		});
@@ -26,7 +26,7 @@ export const commentAPI = {
 
 	// Delete a comment
 	deleteComment: async (commentId, userId) => {
-		return await httpClient.delete(`/api/comments/${commentId}`, { userId });
+		return await httpClient.delete(`${API_BASE}/comments/${commentId}`, { userId });
 	},
 };
 

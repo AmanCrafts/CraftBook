@@ -18,13 +18,13 @@ const PostCard = ({ post, onPress, onCommentPress, userId, initialLiked }) => {
         (width, height) => {
           const aspectRatio = height / width;
           const calculatedHeight = SCREEN_WIDTH * aspectRatio;
-          
+
           // Clamp height between min and max
           const finalHeight = Math.min(
             Math.max(calculatedHeight, MIN_IMAGE_HEIGHT),
             MAX_IMAGE_HEIGHT
           );
-          
+
           setImageHeight(finalHeight);
         },
         (error) => {

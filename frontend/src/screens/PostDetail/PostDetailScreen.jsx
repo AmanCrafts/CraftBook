@@ -103,7 +103,7 @@ const PostDetailScreen = ({ route, navigation }) => {
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
-                nestedScrollEnabled={true}
+                contentContainerStyle={{ flexGrow: 1 }}
             >
                 <Image
                     source={{ uri: post.imageUrl }}
@@ -177,15 +177,15 @@ const PostDetailScreen = ({ route, navigation }) => {
                         </View>
                     </View>
                 </View>
-            </ScrollView>
 
-            <View style={styles.commentsContainer}>
-                <CommentSection
-                    postId={post.id}
-                    currentUserId={currentUser.id}
-                    currentUserName={currentUser.name}
-                />
-            </View>
+                <View style={styles.commentsWrapper}>
+                    <CommentSection
+                        postId={post.id}
+                        currentUserId={currentUser.id}
+                        currentUserName={currentUser.name}
+                    />
+                </View>
+            </ScrollView>
         </View>
     );
 };
@@ -340,8 +340,8 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         color: COLORS.textSecondary,
     },
-    commentsContainer: {
-        flex: 1,
+    commentsWrapper: {
+        minHeight: 400,
         borderTopWidth: 1,
         borderTopColor: COLORS.gray200,
         backgroundColor: COLORS.background,
