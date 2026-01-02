@@ -1,4 +1,3 @@
-import { getAuth } from "firebase/auth";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -12,15 +11,16 @@ import {
 } from "react-native";
 import ImageCropPicker from "../../components/common/ImageCropPicker";
 import COLORS from "../../constants/colors";
+import { useAuth } from "../../contexts/AuthContext";
 
 const UploadScreen = ({ navigation }) => {
+  const { user } = useAuth();
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [medium, setMedium] = useState("");
   const [tags, setTags] = useState("");
   const [loading, setLoading] = useState(false);
-  const auth = getAuth();
 
   const mediumOptions = [
     "Pencil",
@@ -53,7 +53,6 @@ const UploadScreen = ({ navigation }) => {
     setLoading(true);
 
     try {
-      const user = auth.currentUser;
       if (!user) {
         Alert.alert("Error", "You must be logged in to upload.");
         setLoading(false);
@@ -61,18 +60,6 @@ const UploadScreen = ({ navigation }) => {
       }
 
       const API_URL = process.env.EXPO_PUBLIC_API_URL;
-
-      // Get user from backend
-      const userResponse = await fetch(
-        `${API_URL}/api/users/google/${user.uid}`
-      );
-      const userData = await userResponse.json();
-
-      if (!userResponse.ok) {
-        Alert.alert("Error", "User not found. Please complete your profile.");
-        setLoading(false);
-        return;
-      }
 
       // Upload image to Supabase via backend
       const formData = new FormData();
@@ -108,7 +95,7 @@ const UploadScreen = ({ navigation }) => {
       const imageUrl = uploadData.image.url;
 
       const postData = {
-        authorId: userData.id,
+        authorId: user.id,
         title: title.trim(),
         description: description.trim(),
         imageUrl: imageUrl,

@@ -1,10 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
 import { useState } from "react";
 import {
   Alert,
@@ -17,15 +12,17 @@ import {
   View,
 } from "react-native";
 import COLORS from "../../constants/colors";
+import { useAuth } from "../../contexts/AuthContext";
 import Button from "./Button";
 import Input from "./Input";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
-  const auth = getAuth();
+  const { login, register } = useAuth();
 
   const handleAuth = async () => {
     if (!email || !password) {
@@ -33,73 +30,31 @@ const Login = ({ navigation }) => {
       return;
     }
 
+    if (isSignUp && !name) {
+      Alert.alert("Error", "Please enter your name");
+      return;
+    }
+
     setLoading(true);
     try {
-      let userCredential;
       if (isSignUp) {
-        userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
+        await register(email, password, name);
+        // New user registered, navigate to complete profile
+        navigation.navigate("CompleteProfile");
       } else {
-        userCredential = await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-      }
+        const result = await login(email, password);
+        console.log("Login successful:", result.user);
 
-      const user = userCredential.user;
-      console.log("Authentication successful:", user);
-
-      if (isSignUp) {
-        // New user, navigate to profile completion
-        navigation.navigate("CompleteProfile", {
-          googleUser: {
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName || "",
-            photoURL: user.photoURL,
-          },
-        });
-      } else {
-        // Existing user login, check if profile exists
-        try {
-          const response = await fetch(
-            `${process.env.EXPO_PUBLIC_API_URL}/api/users/google/${user.uid}`
-          );
-          if (response.ok) {
-            const userData = await response.json();
-            console.log("User profile found:", userData);
-            // Navigate to main app
-            navigation.replace("MainApp");
-          } else {
-            // User logged in but no profile, send to complete profile
-            navigation.navigate("CompleteProfile", {
-              googleUser: {
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName || "",
-                photoURL: user.photoURL,
-              },
-            });
-          }
-        } catch {
-          console.log("User profile not found, going to profile completion");
-          navigation.navigate("CompleteProfile", {
-            googleUser: {
-              uid: user.uid,
-              email: user.email,
-              displayName: user.displayName || "",
-              photoURL: user.photoURL,
-            },
-          });
+        // Check if profile is complete
+        if (result.user.bio || result.user.medium) {
+          navigation.replace("MainApp");
+        } else {
+          navigation.navigate("CompleteProfile");
         }
       }
     } catch (error) {
       console.error("Authentication error:", error);
-      Alert.alert("Error", error.message);
+      Alert.alert("Error", error.message || "Authentication failed");
     } finally {
       setLoading(false);
     }
@@ -130,6 +85,17 @@ const Login = ({ navigation }) => {
         </View>
 
         <View style={styles.form}>
+          {isSignUp && (
+            <Input
+              label="Name"
+              placeholder="Enter your name"
+              value={name}
+              onChangeText={setName}
+              autoCapitalize="words"
+              icon="person-outline"
+            />
+          )}
+
           <Input
             label="Email"
             placeholder="Enter your email"

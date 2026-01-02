@@ -1,4 +1,3 @@
-import userRepository from "../user/user.repository.js";
 import likeService from "./like.service.js";
 
 /**
@@ -13,7 +12,7 @@ import likeService from "./like.service.js";
 export async function toggleLike(req, res, _next) {
   try {
     const { postId } = req.params;
-    const { userId } = req.body; // This is Firebase UID (googleId)
+    const { userId } = req.body; // This is now the database user ID (cuid string)
 
     if (!userId) {
       return res.status(400).json({
@@ -21,15 +20,7 @@ export async function toggleLike(req, res, _next) {
       });
     }
 
-    // Convert Firebase UID to database user ID
-    const user = await userRepository.findByGoogleId(userId);
-    if (!user) {
-      return res.status(404).json({
-        error: "User not found",
-      });
-    }
-
-    const result = await likeService.toggleLike(user.id, postId);
+    const result = await likeService.toggleLike(userId, postId);
     res.status(200).json(result);
   } catch (error) {
     console.error("Error toggling like:", error);
@@ -64,15 +55,9 @@ export async function getLikesByPostId(req, res, _next) {
  */
 export async function checkUserLike(req, res, _next) {
   try {
-    const { postId, userId } = req.params; // userId is Firebase UID (googleId)
+    const { postId, userId } = req.params; // userId is now the database user ID (cuid string)
 
-    // Convert Firebase UID to database user ID
-    const user = await userRepository.findByGoogleId(userId);
-    if (!user) {
-      return res.status(200).json({ hasLiked: false });
-    }
-
-    const hasLiked = await likeService.hasUserLikedPost(user.id, postId);
+    const hasLiked = await likeService.hasUserLikedPost(userId, postId);
     res.status(200).json({ hasLiked });
   } catch (error) {
     console.error("Error checking like:", error);

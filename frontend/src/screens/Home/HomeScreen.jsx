@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { getAuth } from "firebase/auth";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -14,15 +13,16 @@ import {
 import { likeAPI } from "../../api/like.api";
 import PostCard from "../../components/common/PostCard";
 import COLORS from "../../constants/colors";
+import { useAuth } from "../../contexts/AuthContext";
 
 const HomeScreen = ({ navigation }) => {
+  const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState("recent");
   const [likedPosts, setLikedPosts] = useState({});
-  const auth = getAuth();
-  const currentUserId = auth.currentUser?.uid;
+  const currentUserId = user?.id;
 
   const fetchPosts = useCallback(async () => {
     try {

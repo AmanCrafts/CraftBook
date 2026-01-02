@@ -1,54 +1,71 @@
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useContext, useEffect, useState } from "react";
-import userAPI from "../api/user.api";
+import authAPI from "../api/auth.api";
 
 const AuthContext = createContext({});
 
+const TOKEN_KEY = "craftbook_auth_token";
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [dbUser, setDbUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const auth = getAuth();
 
+  // Check for existing token on app start
   useEffect(() => {
-    // Subscribe to Firebase auth state changes
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      try {
-        if (firebaseUser) {
-          setUser(firebaseUser);
-          setIsAuthenticated(true);
+    checkAuthStatus();
+  }, []);
 
-          // Fetch user profile from database
-          try {
-            const userData = await userAPI.getUserByGoogleId(firebaseUser.uid);
-            setDbUser(userData);
-          } catch (error) {
-            console.error("User profile not found in database:", error);
-            setDbUser(null);
-          }
-        } else {
-          setUser(null);
-          setDbUser(null);
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        console.error("Error in auth state change:", error);
-      } finally {
-        setLoading(false);
+  const checkAuthStatus = async () => {
+    try {
+      const token = await AsyncStorage.getItem(TOKEN_KEY);
+      if (token) {
+        const userData = await authAPI.getCurrentUser(token);
+        setUser(userData);
+        setIsAuthenticated(true);
       }
-    });
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      await AsyncStorage.removeItem(TOKEN_KEY);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // Cleanup subscription
-    return unsubscribe;
-  }, [auth]);
+  const login = async (email, password) => {
+    const result = await authAPI.login({ email, password });
+    await AsyncStorage.setItem(TOKEN_KEY, result.token);
+    setUser(result.user);
+    setIsAuthenticated(true);
+    return result;
+  };
+
+  const register = async (email, password, name) => {
+    const result = await authAPI.register({ email, password, name });
+    await AsyncStorage.setItem(TOKEN_KEY, result.token);
+    setUser(result.user);
+    setIsAuthenticated(true);
+    return result;
+  };
+
+  const logout = async () => {
+    await AsyncStorage.removeItem(TOKEN_KEY);
+    setUser(null);
+    setIsAuthenticated(false);
+  };
+
+  const updateUser = (userData) => {
+    setUser((prev) => ({ ...prev, ...userData }));
+  };
 
   const value = {
     user,
-    dbUser,
     loading,
     isAuthenticated,
-    setDbUser, // Allow manual update after profile completion
+    login,
+    register,
+    logout,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -16,45 +16,34 @@ import Input from "../../components/common/Input";
 import COLORS from "../../constants/colors";
 import { useAuth } from "../../contexts/AuthContext";
 
-const CompleteProfileScreen = ({ route, navigation }) => {
-  const { user: firebaseUser, setDbUser } = useAuth();
-  // Get googleUser from route params (when coming from login) or from context (when app restarts)
-  const googleUser = route.params?.googleUser || firebaseUser;
+const CompleteProfileScreen = ({ navigation }) => {
+  const { user, refreshUser } = useAuth();
 
-  const [name, setName] = useState(googleUser?.displayName || "");
-  const [bio, setBio] = useState("");
-  const [medium, setMedium] = useState("");
+  const [bio, setBio] = useState(user?.bio || "");
+  const [medium, setMedium] = useState(user?.medium || "");
   const [loading, setLoading] = useState(false);
 
   const handleSaveProfile = async () => {
-    if (!name.trim()) {
-      Alert.alert("Error", "Please enter your name");
-      return;
-    }
-
     setLoading(true);
 
     try {
-      if (!googleUser) {
+      if (!user) {
         Alert.alert("Error", "User information not found");
         return;
       }
 
-      // Create user data
+      // Update user profile with additional info
       const userData = {
-        googleId: googleUser.uid,
-        email: googleUser.email,
-        name: name.trim(),
         bio: bio.trim(),
         medium: medium.trim(),
-        profilePicture: googleUser.photoURL || null,
       };
 
-      // Send to backend using API helper
-      const savedUser = await userAPI.createUser(userData);
+      await userAPI.updateUser(user.id, userData);
 
-      // Update the dbUser in AuthContext so navigation knows profile is complete
-      setDbUser(savedUser);
+      // Refresh user data in context
+      if (refreshUser) {
+        await refreshUser();
+      }
 
       Alert.alert("Success", "Profile saved successfully!", [
         {
@@ -68,6 +57,10 @@ const CompleteProfileScreen = ({ route, navigation }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSkip = () => {
+    navigation.replace("MainApp");
   };
 
   return (
@@ -101,14 +94,6 @@ const CompleteProfileScreen = ({ route, navigation }) => {
 
         <View style={styles.form}>
           <Input
-            label="Full Name"
-            value={name}
-            onChangeText={setName}
-            placeholder="Enter your name"
-            icon="person-outline"
-          />
-
-          <Input
             label="Bio (Optional)"
             value={bio}
             onChangeText={setBio}
@@ -134,6 +119,14 @@ const CompleteProfileScreen = ({ route, navigation }) => {
             fullWidth
             icon="checkmark-circle-outline"
             style={styles.saveButton}
+          />
+
+          <Button
+            title="Skip for now"
+            onPress={handleSkip}
+            variant="outline"
+            fullWidth
+            style={styles.skipButton}
           />
         </View>
       </ScrollView>
@@ -192,6 +185,9 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     marginTop: 16,
+  },
+  skipButton: {
+    marginTop: 12,
     marginBottom: 32,
   },
 });

@@ -1,3 +1,7 @@
+// MUST be the very first imports in the entry file for native builds
+import "react-native-gesture-handler";
+import "react-native-reanimated";
+
 import { registerRootComponent } from "expo";
 
 import App from "./src/App";

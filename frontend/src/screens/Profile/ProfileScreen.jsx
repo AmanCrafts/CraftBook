@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { getAuth, signOut } from "firebase/auth";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -22,8 +21,10 @@ import ProfileInfo from "../../components/profile/ProfileInfo";
 import ProfilePostsGrid from "../../components/profile/ProfilePostsGrid";
 import ProfileStats from "../../components/profile/ProfileStats";
 import COLORS from "../../constants/colors";
+import { useAuth } from "../../contexts/AuthContext";
 
 const ProfileScreen = ({ navigation }) => {
+  const { user: authUser, logout } = useAuth();
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,20 +35,17 @@ const ProfileScreen = ({ navigation }) => {
     followers: 0,
     following: 0,
   });
-  const auth = getAuth();
 
   const loadUserProfile = useCallback(async () => {
     try {
-      const currentUser = auth.currentUser;
-      if (!currentUser) {
+      if (!authUser) {
         navigation.replace("Login");
         return;
       }
 
-      const userData = await userAPI.getUserByGoogleId(currentUser.uid);
-      setUser(userData);
+      setUser(authUser);
 
-      const userPosts = await postAPI.getPostsByUserId(userData.id);
+      const userPosts = await postAPI.getPostsByUserId(authUser.id);
       setPosts(userPosts);
 
       setStats({
@@ -61,7 +59,7 @@ const ProfileScreen = ({ navigation }) => {
     } finally {
       setLoading(false);
     }
-  }, [auth, navigation]);
+  }, [authUser, navigation]);
 
   useEffect(() => {
     loadUserProfile();
@@ -174,7 +172,7 @@ const ProfileScreen = ({ navigation }) => {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `Check out ${user.name}'s profile on CraftBook!`,
+        message: "Check out " + user.name + "'s profile on CraftBook!",
       });
     } catch (error) {
       console.error("Error sharing profile:", error);
@@ -193,7 +191,7 @@ const ProfileScreen = ({ navigation }) => {
         style: "destructive",
         onPress: async () => {
           try {
-            await signOut(auth);
+            await logout();
             navigation.replace("Login");
           } catch (error) {
             console.error("Logout error:", error);

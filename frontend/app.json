@@ -6,31 +6,37 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.amancrafts.craftbook"
     },
+
     "android": {
+      "package": "com.amancrafts.craftbook",
+      "permissions": ["INTERNET", "CAMERA", "READ_MEDIA_IMAGES"],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "package": "com.amancrafts.craftbook"
+      }
     },
+
     "web": {
       "favicon": "./assets/favicon.png"
     },
+
     "extra": {
       "eas": {
         "projectId": "6f142bfa-5f24-48ba-9532-2f7952e122d6"
       }
     },
+
     "owner": "amancrafts"
   }
 }

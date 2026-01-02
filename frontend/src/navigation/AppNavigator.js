@@ -13,7 +13,7 @@ const Stack = createStackNavigator();
 
 // App Navigator - root navigation structure with authentication
 const AppNavigator = () => {
-  const { loading, isAuthenticated, dbUser } = useAuth();
+  const { loading, isAuthenticated, user } = useAuth();
 
   // Show loading screen while checking auth state
   if (loading) {
@@ -25,12 +25,10 @@ const AppNavigator = () => {
   }
 
   // Determine initial route based on auth state
+  // User is created directly during registration, so we go straight to MainApp
   const getInitialRoute = () => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !user) {
       return ROUTES.LOGIN;
-    }
-    if (!dbUser) {
-      return ROUTES.COMPLETE_PROFILE;
     }
     return ROUTES.MAIN_APP;
   };

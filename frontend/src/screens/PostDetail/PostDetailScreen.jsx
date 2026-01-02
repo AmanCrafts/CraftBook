@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import { getAuth } from "firebase/auth";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -14,40 +13,31 @@ import {
 } from "react-native";
 import likeAPI from "../../api/like.api";
 import postAPI from "../../api/post.api";
-import userAPI from "../../api/user.api";
 import CommentSection from "../../components/common/CommentSection";
 import LikeButton from "../../components/common/LikeButton";
 import COLORS from "../../constants/colors";
+import { useAuth } from "../../contexts/AuthContext";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const PostDetailScreen = ({ route, navigation }) => {
   const { postId } = route.params;
+  const { user: currentUser } = useAuth();
   const [post, setPost] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
   const [hasLiked, setHasLiked] = useState(false);
   const [loading, setLoading] = useState(true);
-  const auth = getAuth();
 
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
 
-      // Get current user
-      const firebaseUser = auth.currentUser;
-      if (firebaseUser) {
-        const userData = await userAPI.getUserByGoogleId(firebaseUser.uid);
-        setCurrentUser(userData);
-
+      if (currentUser) {
         // Get post
         const postData = await postAPI.getPostById(postId);
         setPost(postData);
 
         // Check if user has liked the post
-        const likeStatus = await likeAPI.checkUserLike(
-          postId,
-          firebaseUser.uid
-        );
+        const likeStatus = await likeAPI.checkUserLike(postId, currentUser.id);
         setHasLiked(likeStatus);
       }
     } catch (error) {
@@ -56,7 +46,7 @@ const PostDetailScreen = ({ route, navigation }) => {
     } finally {
       setLoading(false);
     }
-  }, [postId, auth.currentUser]);
+  }, [postId, currentUser]);
 
   useEffect(() => {
     loadData();
@@ -170,7 +160,7 @@ const PostDetailScreen = ({ route, navigation }) => {
               postId={post.id}
               initialLiked={hasLiked}
               initialCount={post._count?.likes || 0}
-              userId={auth.currentUser?.uid}
+              userId={currentUser?.id}
             />
             <View style={styles.commentIndicator}>
               <Ionicons
