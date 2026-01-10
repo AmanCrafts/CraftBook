@@ -1,4 +1,4 @@
-import { get, post } from "./httpClient";
+import { get, post, put } from "./httpClient";
 
 /**
  * Auth API - Authentication endpoints
@@ -29,8 +29,40 @@ export async function getCurrentUser(token) {
   });
 }
 
+/**
+ * Change user email
+ */
+export async function changeEmail(newEmail, currentPassword, token) {
+  return put(
+    "/api/auth/email",
+    { newEmail, currentPassword },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+}
+
+/**
+ * Change user password
+ */
+export async function changePassword(currentPassword, newPassword, token) {
+  return put(
+    "/api/auth/password",
+    { currentPassword, newPassword },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+}
+
 export default {
   register,
   login,
   getCurrentUser,
+  changeEmail,
+  changePassword,
 };

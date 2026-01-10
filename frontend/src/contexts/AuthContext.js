@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import authAPI from "../api/auth.api";
+import userAPI from "../api/user.api";
 
 const AuthContext = createContext({});
 
@@ -11,12 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Check for existing token on app start
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  const checkAuthStatus = async () => {
+  const checkAuthStatus = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem(TOKEN_KEY);
       if (token) {
@@ -27,10 +23,17 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Auth check failed:", error);
       await AsyncStorage.removeItem(TOKEN_KEY);
+      setUser(null);
+      setIsAuthenticated(false);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Check for existing token on app start
+  useEffect(() => {
+    checkAuthStatus();
+  }, [checkAuthStatus]);
 
   const login = async (email, password) => {
     const result = await authAPI.login({ email, password });
@@ -58,6 +61,33 @@ export const AuthProvider = ({ children }) => {
     setUser((prev) => ({ ...prev, ...userData }));
   };
 
+  const changeEmail = async (newEmail, currentPassword) => {
+    const token = await AsyncStorage.getItem(TOKEN_KEY);
+    if (!token) throw new Error("Not authenticated");
+
+    const updatedUser = await authAPI.changeEmail(
+      newEmail,
+      currentPassword,
+      token
+    );
+    setUser(updatedUser);
+    return updatedUser;
+  };
+
+  const changePassword = async (currentPassword, newPassword) => {
+    const token = await AsyncStorage.getItem(TOKEN_KEY);
+    if (!token) throw new Error("Not authenticated");
+
+    return await authAPI.changePassword(currentPassword, newPassword, token);
+  };
+
+  const deleteAccount = async () => {
+    if (!user) throw new Error("Not authenticated");
+
+    await userAPI.deleteUserWithAllData(user.id);
+    await logout();
+  };
+
   const value = {
     user,
     loading,
@@ -66,6 +96,9 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateUser,
+    changeEmail,
+    changePassword,
+    deleteAccount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

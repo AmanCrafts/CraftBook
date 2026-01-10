@@ -12,4 +12,10 @@ router.post("/login", authController.login);
 // GET /api/auth/me - Get current user
 router.get("/me", authController.getCurrentUser);
 
+// PUT /api/auth/email - Change email
+router.put("/email", authController.changeEmail);
+
+// PUT /api/auth/password - Change password
+router.put("/password", authController.changePassword);
+
 export default router;

@@ -83,9 +83,72 @@ export async function verifyToken(token) {
       throw new Error("User not found");
     }
     return sanitizeUser(user);
-  } catch (error) {
+  } catch {
     throw new Error("Invalid or expired token");
   }
+}
+
+/**
+ * Change user email
+ */
+export async function changeEmail(userId, newEmail, currentPassword) {
+  if (!newEmail || !currentPassword) {
+    throw new Error("New email and current password are required");
+  }
+
+  // Get user with password
+  const user = await userRepository.findById(userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // Verify current password
+  const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+  if (!isValidPassword) {
+    throw new Error("Current password is incorrect");
+  }
+
+  // Check if new email is already taken
+  const existingUser = await userRepository.findByEmail(newEmail);
+  if (existingUser && existingUser.id !== userId) {
+    throw new Error("Email is already in use");
+  }
+
+  // Update email
+  const updatedUser = await userRepository.update(userId, { email: newEmail });
+  return sanitizeUser(updatedUser);
+}
+
+/**
+ * Change user password
+ */
+export async function changePassword(userId, currentPassword, newPassword) {
+  if (!currentPassword || !newPassword) {
+    throw new Error("Current password and new password are required");
+  }
+
+  if (newPassword.length < 6) {
+    throw new Error("New password must be at least 6 characters");
+  }
+
+  // Get user with password
+  const user = await userRepository.findById(userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // Verify current password
+  const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+  if (!isValidPassword) {
+    throw new Error("Current password is incorrect");
+  }
+
+  // Hash new password
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  // Update password
+  await userRepository.update(userId, { password: hashedPassword });
+  return { message: "Password updated successfully" };
 }
 
 /**
@@ -109,4 +172,6 @@ export default {
   register,
   login,
   verifyToken,
+  changeEmail,
+  changePassword,
 };

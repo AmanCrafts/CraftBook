@@ -25,4 +25,7 @@ router.put("/:id", userController.updateUser);
 // DELETE /api/users/:id - Delete user
 router.delete("/:id", userController.deleteUser);
 
+// DELETE /api/users/:id/full - Delete user with all related data
+router.delete("/:id/full", userController.deleteUserWithAllData);
+
 export default router;

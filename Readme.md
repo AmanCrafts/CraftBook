@@ -141,19 +141,6 @@ NODE_ENV=development
 **Frontend** (`frontend/.env`):
 
 ```env
-# Firebase Configuration
-EXPO_PUBLIC_FIREBASE_API_KEY=your-api-key
-EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your-app.firebaseapp.com
-EXPO_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your-app.appspot.com
-EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
-EXPO_PUBLIC_FIREBASE_APP_ID=your-app-id
-
-# Supabase Configuration
-EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-EXPO_PUBLIC_SUPABASE_BUCKET_NAME=Images
-
 # Backend URL (use your computer's local IP for mobile devices)
 EXPO_PUBLIC_API_URL=http://YOUR_LOCAL_IP:3000
 ```

@@ -14,21 +14,31 @@ import {
 import postAPI from "../../api/post.api";
 import uploadAPI from "../../api/upload.api";
 import userAPI from "../../api/user.api";
+import ArtistInfo from "../../components/profile/ArtistInfo";
 import EditProfileModal from "../../components/profile/EditProfileModal";
 import ProfileActions from "../../components/profile/ProfileActions";
 import ProfileHeader from "../../components/profile/ProfileHeader";
 import ProfileInfo from "../../components/profile/ProfileInfo";
 import ProfilePostsGrid from "../../components/profile/ProfilePostsGrid";
 import ProfileStats from "../../components/profile/ProfileStats";
+import SettingsModal from "../../components/profile/SettingsModal";
 import COLORS from "../../constants/colors";
 import { useAuth } from "../../contexts/AuthContext";
 
 const ProfileScreen = ({ navigation }) => {
-  const { user: authUser, logout } = useAuth();
+  const {
+    user: authUser,
+    logout,
+    updateUser: updateAuthUser,
+    changeEmail,
+    changePassword,
+    deleteAccount,
+  } = useAuth();
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editModalVisible, setEditModalVisible] = useState(false);
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [stats, setStats] = useState({
     posts: 0,
@@ -94,10 +104,12 @@ const ProfileScreen = ({ navigation }) => {
           await userAPI.updateUser(user.id, {
             profilePicture: uploadResult.image.url,
           });
-          setUser((prev) => ({
-            ...prev,
+          const updatedUser = {
+            ...user,
             profilePicture: uploadResult.image.url,
-          }));
+          };
+          setUser(updatedUser);
+          updateAuthUser(updatedUser);
           Alert.alert("Success", "Profile picture updated");
         } catch (error) {
           console.error("Error uploading avatar:", error);
@@ -141,7 +153,9 @@ const ProfileScreen = ({ navigation }) => {
           await userAPI.updateUser(user.id, {
             bannerImage: uploadResult.image.url,
           });
-          setUser((prev) => ({ ...prev, bannerImage: uploadResult.image.url }));
+          const updatedUser = { ...user, bannerImage: uploadResult.image.url };
+          setUser(updatedUser);
+          updateAuthUser(updatedUser);
           Alert.alert("Success", "Banner image updated");
         } catch (error) {
           console.error("Error uploading banner:", error);
@@ -158,8 +172,9 @@ const ProfileScreen = ({ navigation }) => {
 
   const handleUpdateProfile = async (data) => {
     try {
-      await userAPI.updateUser(user.id, data);
+      const updatedUser = await userAPI.updateUser(user.id, data);
       setUser((prev) => ({ ...prev, ...data }));
+      updateAuthUser(updatedUser);
       setEditModalVisible(false);
       Alert.alert("Success", "Profile updated successfully");
     } catch (error) {
@@ -172,7 +187,7 @@ const ProfileScreen = ({ navigation }) => {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: "Check out " + user.name + "'s profile on CraftBook!",
+        message: `Check out ${user.name}'s profile on CraftBook! A talented artist specializing in ${user.medium || "various art forms"}.`,
       });
     } catch (error) {
       console.error("Error sharing profile:", error);
@@ -180,7 +195,21 @@ const ProfileScreen = ({ navigation }) => {
   };
 
   const handleSettings = () => {
-    Alert.alert("Settings", "Settings feature coming soon!");
+    setSettingsModalVisible(true);
+  };
+
+  const handleChangeEmail = async (newEmail, currentPassword) => {
+    const updatedUser = await changeEmail(newEmail, currentPassword);
+    setUser(updatedUser);
+  };
+
+  const handleChangePassword = async (currentPassword, newPassword) => {
+    await changePassword(currentPassword, newPassword);
+  };
+
+  const handleDeleteAccount = async () => {
+    await deleteAccount();
+    navigation.replace("Login");
   };
 
   const handleLogout = () => {
@@ -200,6 +229,15 @@ const ProfileScreen = ({ navigation }) => {
         },
       },
     ]);
+  };
+
+  // Parse art styles from medium if available
+  const getArtStyles = () => {
+    if (!user?.medium) return [];
+    return user.medium
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s);
   };
 
   if (loading) {
@@ -260,6 +298,38 @@ const ProfileScreen = ({ navigation }) => {
           isOwnProfile
         />
 
+        {/* Artist Info Section */}
+        {user.medium && (
+          <ArtistInfo
+            medium={user.medium?.split(",")[0]?.trim()}
+            artStyles={getArtStyles()}
+            experience={user.experience}
+            portfolio={user.portfolio}
+          />
+        )}
+
+        {/* Account Info Section */}
+        <View style={styles.accountSection}>
+          <View style={styles.accountHeader}>
+            <Ionicons name="shield-checkmark" size={20} color={COLORS.info} />
+            <Text style={styles.accountTitle}>Account Information</Text>
+          </View>
+          <View style={styles.accountItem}>
+            <Text style={styles.accountLabel}>Email</Text>
+            <Text style={styles.accountValue}>{user.email}</Text>
+          </View>
+          <View style={styles.accountItem}>
+            <Text style={styles.accountLabel}>Member Since</Text>
+            <Text style={styles.accountValue}>
+              {new Date(user.createdAt).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </Text>
+          </View>
+        </View>
+
         <ProfilePostsGrid
           posts={posts}
           onPostPress={(post) =>
@@ -267,12 +337,17 @@ const ProfileScreen = ({ navigation }) => {
           }
           onUploadPress={() => navigation.navigate("Upload")}
         />
+
+        {/* Spacer at bottom */}
+        <View style={{ height: 40 }} />
       </ScrollView>
 
+      {/* Logout Button */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Ionicons name="log-out-outline" size={20} color={COLORS.danger} />
+        <Ionicons name="log-out-outline" size={20} color={COLORS.error} />
       </TouchableOpacity>
 
+      {/* Edit Profile Modal */}
       <EditProfileModal
         visible={editModalVisible}
         user={user}
@@ -280,6 +355,17 @@ const ProfileScreen = ({ navigation }) => {
         onSave={handleUpdateProfile}
       />
 
+      {/* Settings Modal */}
+      <SettingsModal
+        visible={settingsModalVisible}
+        user={user}
+        onClose={() => setSettingsModalVisible(false)}
+        onChangeEmail={handleChangeEmail}
+        onChangePassword={handleChangePassword}
+        onDeleteAccount={handleDeleteAccount}
+      />
+
+      {/* Uploading Overlay */}
       {uploadingImage && (
         <View style={styles.uploadingOverlay}>
           <View style={styles.uploadingContainer}>
@@ -365,6 +451,47 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.gray700,
     fontWeight: "600",
+  },
+  accountSection: {
+    backgroundColor: COLORS.white,
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  accountHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  accountTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: COLORS.text,
+  },
+  accountItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  accountLabel: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  accountValue: {
+    fontSize: 14,
+    color: COLORS.text,
+    fontWeight: "500",
   },
 });
 

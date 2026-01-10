@@ -33,6 +33,11 @@ export const userAPI = {
   deleteUser: async (id) => {
     return await httpClient.delete(API_ENDPOINTS.USER_BY_ID(id));
   },
+
+  // Delete user with all data (posts, comments, likes)
+  deleteUserWithAllData: async (id) => {
+    return await httpClient.delete(`${API_ENDPOINTS.USER_BY_ID(id)}/full`);
+  },
 };
 
 export default userAPI;

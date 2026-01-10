@@ -115,6 +115,24 @@ export async function deleteUser(req, res, _next) {
   }
 }
 
+/**
+ * Delete user and all related data
+ * DELETE /api/users/:id/full
+ */
+export async function deleteUserWithAllData(req, res, _next) {
+  try {
+    const { id } = req.params;
+    await userService.deleteUserWithAllData(id);
+    res.status(204).send();
+  } catch (error) {
+    console.error("Error deleting user with all data:", error);
+    res.status(error.message === "User not found" ? 404 : 500).json({
+      error: "Error deleting user",
+      details: error.message,
+    });
+  }
+}
+
 // Default export for compatibility
 export default {
   createUser,
@@ -123,4 +141,5 @@ export default {
   getAllUsers,
   updateUser,
   deleteUser,
+  deleteUserWithAllData,
 };

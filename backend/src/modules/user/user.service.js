@@ -84,6 +84,17 @@ export async function deleteUser(id) {
   return await userRepository.delete(id);
 }
 
+/**
+ * Delete user and all related data
+ */
+export async function deleteUserWithAllData(id) {
+  // Check if user exists
+  await getUserById(id);
+
+  // Delete user with all data
+  return await userRepository.deleteUserWithAllData(id);
+}
+
 // Default export for compatibility
 export default {
   createUser,
@@ -92,4 +103,5 @@ export default {
   getAllUsers,
   updateUser,
   deleteUser,
+  deleteUserWithAllData,
 };
