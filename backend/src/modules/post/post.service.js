@@ -120,6 +120,16 @@ export async function getProcessPosts() {
 }
 
 /**
+ * Get posts from users that a user is following
+ */
+export async function getFollowingPosts(followingIds) {
+  if (!followingIds || followingIds.length === 0) {
+    return [];
+  }
+  return await postRepository.findFollowingPosts(followingIds);
+}
+
+/**
  * Update post
  */
 export async function updatePost(id, postData) {
@@ -155,6 +165,7 @@ export default {
   getRecentPosts,
   getPopularPosts,
   getProcessPosts,
+  getFollowingPosts,
   updatePost,
   deletePost,
 };

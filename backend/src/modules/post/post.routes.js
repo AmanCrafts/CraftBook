@@ -19,6 +19,9 @@ router.get("/popular", postController.getPopularPosts);
 // GET /api/posts/process - Get process posts
 router.get("/process", postController.getProcessPosts);
 
+// POST /api/posts/following - Get posts from followed users
+router.post("/following", postController.getFollowingPosts);
+
 // GET /api/posts/user/:userId - Get posts by user ID
 router.get("/user/:userId", postController.getPostsByUserId);
 

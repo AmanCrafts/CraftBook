@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import COLORS from "../../constants/colors";
+import FollowButton from "./FollowButton";
 import LikeButton from "./LikeButton";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -22,8 +23,11 @@ const PostCard = ({
   onProfilePress,
   userId,
   initialLiked,
+  initialFollowing = false,
+  onFollowChange,
 }) => {
   const [imageHeight, setImageHeight] = useState(300);
+  const isOwnPost = userId === post.author?.id;
 
   useEffect(() => {
     if (post.imageUrl) {
@@ -79,6 +83,15 @@ const PostCard = ({
               <Text style={styles.medium}>{post.medium || "Mixed Media"}</Text>
             </View>
           </TouchableOpacity>
+          {!isOwnPost && (
+            <FollowButton
+              userId={post.author?.id}
+              currentUserId={userId}
+              initialIsFollowing={initialFollowing}
+              onFollowChange={onFollowChange}
+              size="small"
+            />
+          )}
         </View>
 
         <Text style={styles.title}>{post.title}</Text>

@@ -240,6 +240,26 @@ export async function deletePost(id) {
   });
 }
 
+/**
+ * Find posts from users that a user is following
+ */
+export async function findFollowingPosts(userIds) {
+  return await prisma.post.findMany({
+    where: {
+      authorId: {
+        in: userIds,
+      },
+    },
+    include: {
+      author: true,
+      _count: {
+        select: { likes: true, comments: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
 // Default export for compatibility
 export default {
   create,
@@ -254,6 +274,7 @@ export default {
   findRecent,
   findPopular,
   findProcessPosts,
+  findFollowingPosts,
   update,
   delete: deletePost,
 };

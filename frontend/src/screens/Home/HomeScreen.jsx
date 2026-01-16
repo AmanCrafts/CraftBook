@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import followAPI from "../../api/follow.api";
 import { likeAPI } from "../../api/like.api";
 import PostCard from "../../components/common/PostCard";
 import COLORS from "../../constants/colors";
@@ -23,48 +24,80 @@ const HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState("recent");
   const [likedPosts, setLikedPosts] = useState({});
+  const [followingStatus, setFollowingStatus] = useState({});
+  const [hasNoFollowing, setHasNoFollowing] = useState(false);
   const currentUserId = user?.id;
 
   const fetchPosts = useCallback(async () => {
     try {
       const API_URL = process.env.EXPO_PUBLIC_API_URL;
+      let data = [];
 
-      // Fetch posts based on filter
-      let endpoint = "/api/posts/recent";
-      if (filter === "popular") {
-        endpoint = "/api/posts/popular";
+      // Handle "following" filter
+      if (filter === "following" && currentUserId) {
+        // Fetch list of users the current user is following
+        const followingIds = await followAPI.getFollowingIds(currentUserId);
+
+        if (followingIds.length === 0) {
+          setHasNoFollowing(true);
+          setPosts([]);
+          setLoading(false);
+          setRefreshing(false);
+          return;
+        }
+
+        setHasNoFollowing(false);
+        // Fetch posts from followed users
+        data = await followAPI.getFollowingPosts(followingIds);
+      } else {
+        setHasNoFollowing(false);
+
+        // Fetch posts based on filter
+        let endpoint = "/api/posts/recent";
+        if (filter === "popular") {
+          endpoint = "/api/posts/popular";
+        }
+
+        const response = await fetch(`${API_URL}${endpoint}`);
+        data = await response.json();
+
+        if (!response.ok) {
+          console.error("Error fetching posts:", data.error);
+          data = [];
+        }
       }
 
-      const response = await fetch(`${API_URL}${endpoint}`);
-      const data = await response.json();
+      setPosts(data);
 
-      if (response.ok) {
-        setPosts(data);
+      // Fetch like status and following status for all posts
+      if (currentUserId && data.length > 0) {
+        const likeStatuses = {};
+        const authorIds = [
+          ...new Set(data.map((post) => post.author?.id).filter(Boolean)),
+        ];
 
-        // Fetch like status for all posts
-        if (currentUserId) {
-          const likeStatuses = {};
-          await Promise.all(
-            data.map(async (post) => {
-              try {
-                const liked = await likeAPI.checkUserLike(
-                  post.id,
-                  currentUserId
-                );
-                likeStatuses[post.id] = liked;
-              } catch (error) {
-                console.error(
-                  `Error checking like for post ${post.id}:`,
-                  error
-                );
-                likeStatuses[post.id] = false;
-              }
-            })
+        // Batch check following status
+        let followStatuses = {};
+        if (authorIds.length > 0) {
+          followStatuses = await followAPI.checkFollowingBatch(
+            currentUserId,
+            authorIds
           );
-          setLikedPosts(likeStatuses);
         }
-      } else {
-        console.error("Error fetching posts:", data.error);
+        setFollowingStatus(followStatuses);
+
+        await Promise.all(
+          data.map(async (post) => {
+            try {
+              const liked = await likeAPI.checkUserLike(post.id, currentUserId);
+              likeStatuses[post.id] = liked;
+            } catch (error) {
+              console.error(`Error checking like for post ${post.id}:`, error);
+              likeStatuses[post.id] = false;
+            }
+          })
+        );
+        setLikedPosts(likeStatuses);
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -91,6 +124,13 @@ const HomeScreen = ({ navigation }) => {
     if (userId) {
       navigation.navigate(ROUTES.USER_PROFILE, { userId });
     }
+  };
+
+  const handleFollowChange = (authorId, isFollowing) => {
+    setFollowingStatus((prev) => ({
+      ...prev,
+      [authorId]: isFollowing,
+    }));
   };
 
   const getFilterIcon = (filterType) => {
@@ -174,6 +214,10 @@ const HomeScreen = ({ navigation }) => {
             onProfilePress={handleProfilePress}
             userId={currentUserId}
             initialLiked={likedPosts[item.id] || false}
+            initialFollowing={followingStatus[item.author?.id] || false}
+            onFollowChange={(isFollowing) =>
+              handleFollowChange(item.author?.id, isFollowing)
+            }
           />
         )}
         contentContainerStyle={styles.listContent}
@@ -186,12 +230,34 @@ const HomeScreen = ({ navigation }) => {
           />
         }
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyTitle}>No posts yet</Text>
-            <Text style={styles.emptySubtitle}>
-              Be the first to share your artwork!
-            </Text>
-          </View>
+          filter === "following" && hasNoFollowing ? (
+            <View style={styles.emptyContainer}>
+              <Ionicons
+                name="people-outline"
+                size={60}
+                color={COLORS.gray400}
+              />
+              <Text style={styles.emptyTitle}>No one to follow yet</Text>
+              <Text style={styles.emptySubtitle}>
+                Start following artists to see their posts here!
+              </Text>
+              <TouchableOpacity
+                style={styles.exploreButton}
+                onPress={() => setFilter("recent")}
+              >
+                <Text style={styles.exploreButtonText}>
+                  Explore Recent Posts
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyTitle}>No posts yet</Text>
+              <Text style={styles.emptySubtitle}>
+                Be the first to share your artwork!
+              </Text>
+            </View>
+          )
         }
       />
     </View>
@@ -291,6 +357,18 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     textAlign: "center",
     lineHeight: 20,
+  },
+  exploreButton: {
+    marginTop: 20,
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+  },
+  exploreButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
 

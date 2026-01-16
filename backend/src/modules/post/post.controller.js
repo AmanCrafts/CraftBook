@@ -252,6 +252,24 @@ export async function deletePost(req, res, _next) {
   }
 }
 
+/**
+ * Get posts from followed users
+ * POST /api/posts/following
+ */
+export async function getFollowingPosts(req, res, _next) {
+  try {
+    const { followingIds } = req.body;
+    const posts = await postService.getFollowingPosts(followingIds);
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error("Error fetching following posts:", error);
+    res.status(500).json({
+      error: "Error fetching following posts",
+      details: error.message,
+    });
+  }
+}
+
 // Default export for compatibility
 export default {
   createPost,
@@ -266,6 +284,7 @@ export default {
   getRecentPosts,
   getPopularPosts,
   getProcessPosts,
+  getFollowingPosts,
   updatePost,
   deletePost,
 };

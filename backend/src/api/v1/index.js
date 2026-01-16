@@ -1,6 +1,7 @@
 import express from "express";
 import authRoutes from "../../modules/auth/auth.routes.js";
 import commentRoutes from "../../modules/comment/comment.routes.js";
+import followRoutes from "../../modules/follow/follow.routes.js";
 import likeRoutes from "../../modules/like/like.routes.js";
 import postRoutes from "../../modules/post/post.routes.js";
 import uploadRoutes from "../../modules/upload/upload.routes.js";
@@ -25,6 +26,7 @@ router.get("/health", (_req, res) => {
 // Mount module routes
 router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
+router.use("/users", followRoutes);
 router.use("/posts", postRoutes);
 router.use("/posts", likeRoutes);
 router.use("/posts", commentRoutes);

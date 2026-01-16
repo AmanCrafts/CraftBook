@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import followAPI from "../../api/follow.api";
 import postAPI from "../../api/post.api";
 import uploadAPI from "../../api/upload.api";
 import userAPI from "../../api/user.api";
@@ -58,10 +59,13 @@ const ProfileScreen = ({ navigation }) => {
       const userPosts = await postAPI.getPostsByUserId(authUser.id);
       setPosts(userPosts);
 
+      // Fetch follow stats
+      const followStats = await followAPI.getFollowStats(authUser.id);
+
       setStats({
         posts: userPosts.length,
-        followers: 0,
-        following: 0,
+        followers: followStats.followers || 0,
+        following: followStats.following || 0,
       });
     } catch (error) {
       console.error("Error loading profile:", error);

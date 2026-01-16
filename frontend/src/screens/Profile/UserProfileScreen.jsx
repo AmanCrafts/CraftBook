@@ -10,8 +10,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import followAPI from "../../api/follow.api";
 import postAPI from "../../api/post.api";
 import userAPI from "../../api/user.api";
+import FollowButton from "../../components/common/FollowButton";
 import ArtistInfo from "../../components/profile/ArtistInfo";
 import ProfileHeader from "../../components/profile/ProfileHeader";
 import ProfileInfo from "../../components/profile/ProfileInfo";
@@ -26,6 +28,7 @@ const UserProfileScreen = ({ route, navigation }) => {
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isFollowing, setIsFollowing] = useState(false);
   const [stats, setStats] = useState({
     posts: 0,
     followers: 0,
@@ -56,10 +59,22 @@ const UserProfileScreen = ({ route, navigation }) => {
       const userPosts = await postAPI.getPostsByUserId(userId);
       setPosts(userPosts);
 
+      // Fetch follow stats
+      const followStats = await followAPI.getFollowStats(userId);
+
+      // Check if current user is following this user
+      if (currentUser?.id) {
+        const following = await followAPI.checkFollowing(
+          userId,
+          currentUser.id
+        );
+        setIsFollowing(following);
+      }
+
       setStats({
         posts: userPosts.length,
-        followers: 0,
-        following: 0,
+        followers: followStats.followers || 0,
+        following: followStats.following || 0,
       });
     } catch (error) {
       console.error("Error loading user profile:", error);
@@ -68,7 +83,7 @@ const UserProfileScreen = ({ route, navigation }) => {
     } finally {
       setLoading(false);
     }
-  }, [userId, isOwnProfile, navigation]);
+  }, [userId, isOwnProfile, navigation, currentUser?.id]);
 
   useEffect(() => {
     loadUserProfile();
@@ -84,9 +99,13 @@ const UserProfileScreen = ({ route, navigation }) => {
     }
   };
 
-  const handleFollow = () => {
-    // TODO: Implement follow functionality
-    Alert.alert("Coming Soon", "Follow feature will be available soon!");
+  const handleFollowChange = (newIsFollowing) => {
+    setIsFollowing(newIsFollowing);
+    // Update follower count
+    setStats((prev) => ({
+      ...prev,
+      followers: newIsFollowing ? prev.followers + 1 : prev.followers - 1,
+    }));
   };
 
   const handleMessage = () => {
@@ -162,14 +181,14 @@ const UserProfileScreen = ({ route, navigation }) => {
 
         {/* Action Buttons for Other Users */}
         <View style={styles.actionsContainer}>
-          <TouchableOpacity style={styles.followButton} onPress={handleFollow}>
-            <Ionicons
-              name="person-add-outline"
-              size={20}
-              color={COLORS.white}
-            />
-            <Text style={styles.followButtonText}>Follow</Text>
-          </TouchableOpacity>
+          <FollowButton
+            userId={userId}
+            currentUserId={currentUser?.id}
+            initialIsFollowing={isFollowing}
+            onFollowChange={handleFollowChange}
+            size="large"
+            showIcon={true}
+          />
 
           <TouchableOpacity
             style={styles.messageButton}
