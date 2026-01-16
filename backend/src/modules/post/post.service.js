@@ -99,17 +99,17 @@ export async function searchPostsByDescription(description) {
 }
 
 /**
- * Get recent posts
+ * Get recent posts with pagination
  */
-export async function getRecentPosts(limit = 10) {
-  return await postRepository.findRecent(limit);
+export async function getRecentPosts({ limit = 10, cursor = null } = {}) {
+  return await postRepository.findRecent({ limit, cursor });
 }
 
 /**
- * Get popular posts
+ * Get popular posts with pagination
  */
-export async function getPopularPosts(limit = 10) {
-  return await postRepository.findPopular(limit);
+export async function getPopularPosts({ limit = 10, page = 1 } = {}) {
+  return await postRepository.findPopular({ limit, page });
 }
 
 /**

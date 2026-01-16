@@ -164,39 +164,68 @@ export async function searchByDescription(description) {
 }
 
 /**
- * Get recent posts
+ * Get recent posts with pagination
  */
-export async function findRecent(limit = 10) {
-  return await prisma.post.findMany({
+export async function findRecent({ limit = 10, cursor = null } = {}) {
+  const query = {
     orderBy: { createdAt: "desc" },
-    take: limit,
+    take: limit + 1, // Take one extra to check if there are more
     include: {
       author: true,
       _count: {
         select: { likes: true, comments: true },
       },
     },
-  });
+  };
+
+  if (cursor) {
+    query.cursor = { id: cursor };
+    query.skip = 1; // Skip the cursor itself
+  }
+
+  const posts = await prisma.post.findMany(query);
+
+  const hasMore = posts.length > limit;
+  const data = hasMore ? posts.slice(0, -1) : posts;
+  const nextCursor = hasMore ? data[data.length - 1]?.id : null;
+
+  return {
+    posts: data,
+    nextCursor,
+    hasMore,
+  };
 }
 
 /**
- * Get popular posts (ordered by likes count)
+ * Get popular posts with pagination (ordered by likes count)
  */
-export async function findPopular(limit = 10) {
-  return await prisma.post.findMany({
-    take: limit,
-    include: {
-      author: true,
-      _count: {
-        select: { likes: true, comments: true },
+export async function findPopular({ limit = 10, page = 1 } = {}) {
+  const skip = (page - 1) * limit;
+
+  const [posts, total] = await Promise.all([
+    prisma.post.findMany({
+      take: limit,
+      skip,
+      include: {
+        author: true,
+        _count: {
+          select: { likes: true, comments: true },
+        },
       },
-    },
-    orderBy: {
-      likes: {
-        _count: "desc",
+      orderBy: {
+        likes: {
+          _count: "desc",
+        },
       },
-    },
-  });
+    }),
+    prisma.post.count(),
+  ]);
+
+  return {
+    posts,
+    page,
+    hasMore: skip + posts.length < total,
+  };
 }
 
 /**

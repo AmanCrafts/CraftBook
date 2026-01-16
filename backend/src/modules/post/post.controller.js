@@ -166,13 +166,17 @@ export async function searchPostsByDescription(req, res, _next) {
 }
 
 /**
- * Get recent posts
- * GET /api/posts/recent
+ * Get recent posts with pagination
+ * GET /api/posts/recent?limit=10&cursor=xxx
  */
-export async function getRecentPosts(_req, res, _next) {
+export async function getRecentPosts(req, res, _next) {
   try {
-    const posts = await postService.getRecentPosts();
-    res.status(200).json(posts);
+    const { limit = 10, cursor } = req.query;
+    const result = await postService.getRecentPosts({
+      limit: parseInt(limit, 10),
+      cursor: cursor || null,
+    });
+    res.status(200).json(result);
   } catch (error) {
     console.error("Error fetching recent posts:", error);
     res.status(500).json({
@@ -183,13 +187,17 @@ export async function getRecentPosts(_req, res, _next) {
 }
 
 /**
- * Get popular posts
- * GET /api/posts/popular
+ * Get popular posts with pagination
+ * GET /api/posts/popular?limit=10&page=1
  */
-export async function getPopularPosts(_req, res, _next) {
+export async function getPopularPosts(req, res, _next) {
   try {
-    const posts = await postService.getPopularPosts();
-    res.status(200).json(posts);
+    const { limit = 10, page = 1 } = req.query;
+    const result = await postService.getPopularPosts({
+      limit: parseInt(limit, 10),
+      page: parseInt(page, 10),
+    });
+    res.status(200).json(result);
   } catch (error) {
     console.error("Error fetching popular posts:", error);
     res.status(500).json({
