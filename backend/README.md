@@ -128,6 +128,62 @@ npm run dev
 npm start
 ```
 
+## 🧪 Test Accounts
+
+The database is seeded with test data for development and testing purposes. All test accounts share the same password.
+
+### Default Password for All Test Accounts
+
+```
+password123
+```
+
+### Sample Test Accounts
+
+| Email                            | Name               | Medium  |
+| -------------------------------- | ------------------ | ------- |
+| `emma.smith@example.com`         | Emma Smith         | Various |
+| `liam.johnson@example.com`       | Liam Johnson       | Various |
+| `olivia.williams@example.com`    | Olivia Williams    | Various |
+| `noah.brown@example.com`         | Noah Brown         | Various |
+| `ava.jones@example.com`          | Ava Jones          | Various |
+| `ethan.garcia@example.com`       | Ethan Garcia       | Various |
+| `sophia.miller@example.com`      | Sophia Miller      | Various |
+| `mason.davis@example.com`        | Mason Davis        | Various |
+| `isabella.rodriguez@example.com` | Isabella Rodriguez | Various |
+| `william.martinez@example.com`   | William Martinez   | Various |
+
+### Seed Data Overview
+
+- **50 Users** - Each with unique profile pictures and bios
+- **500-750 Posts** - Each user has 10-15 posts with artistic images
+- **5-30 Likes per Post** - Random likes from other users
+- **Comments** - Random comments on posts
+- **Follow Relationships** - Users follow each other randomly
+
+### Running the Seed Script
+
+To reset and reseed the database:
+
+```bash
+npm run prisma:seed
+```
+
+> ⚠️ **Warning**: This will delete all existing data and replace it with fresh test data.
+
+### Email Pattern
+
+All test user emails follow the pattern:
+
+```
+{firstname}.{lastname}@example.com
+```
+
+For example:
+
+- First name: `Emma`, Last name: `Smith` → `emma.smith@example.com`
+- First name: `Liam`, Last name: `Johnson` → `liam.johnson@example.com`
+
 ## 📡 API Endpoints
 
 ### Health Check
