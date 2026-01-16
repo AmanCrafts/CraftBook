@@ -24,7 +24,7 @@ export async function toggleFollow(followerId, followingId) {
 
   if (existingFollow) {
     // Unfollow
-    await followRepository.delete(existingFollow.id);
+    await followRepository.deleteFollow(existingFollow.id);
     return {
       action: "unfollowed",
       isFollowing: false,

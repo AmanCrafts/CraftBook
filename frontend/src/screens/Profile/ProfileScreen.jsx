@@ -17,6 +17,7 @@ import uploadAPI from "../../api/upload.api";
 import userAPI from "../../api/user.api";
 import ArtistInfo from "../../components/profile/ArtistInfo";
 import EditProfileModal from "../../components/profile/EditProfileModal";
+import FollowListModal from "../../components/profile/FollowListModal";
 import ProfileActions from "../../components/profile/ProfileActions";
 import ProfileHeader from "../../components/profile/ProfileHeader";
 import ProfileInfo from "../../components/profile/ProfileInfo";
@@ -24,6 +25,7 @@ import ProfilePostsGrid from "../../components/profile/ProfilePostsGrid";
 import ProfileStats from "../../components/profile/ProfileStats";
 import SettingsModal from "../../components/profile/SettingsModal";
 import COLORS from "../../constants/colors";
+import ROUTES from "../../constants/routes";
 import { useAuth } from "../../contexts/AuthContext";
 
 const ProfileScreen = ({ navigation }) => {
@@ -40,6 +42,8 @@ const ProfileScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+  const [followListVisible, setFollowListVisible] = useState(false);
+  const [followListType, setFollowListType] = useState("followers");
   const [uploadingImage, setUploadingImage] = useState(false);
   const [stats, setStats] = useState({
     posts: 0,
@@ -202,6 +206,20 @@ const ProfileScreen = ({ navigation }) => {
     setSettingsModalVisible(true);
   };
 
+  const handleFollowersPress = () => {
+    setFollowListType("followers");
+    setFollowListVisible(true);
+  };
+
+  const handleFollowingPress = () => {
+    setFollowListType("following");
+    setFollowListVisible(true);
+  };
+
+  const handleUserPress = (userId) => {
+    navigation.navigate(ROUTES.USER_PROFILE, { userId });
+  };
+
   const handleChangeEmail = async (newEmail, currentPassword) => {
     const updatedUser = await changeEmail(newEmail, currentPassword);
     setUser(updatedUser);
@@ -293,6 +311,8 @@ const ProfileScreen = ({ navigation }) => {
           posts={stats.posts}
           followers={stats.followers}
           following={stats.following}
+          onFollowersPress={handleFollowersPress}
+          onFollowingPress={handleFollowingPress}
         />
 
         <ProfileActions
@@ -367,6 +387,16 @@ const ProfileScreen = ({ navigation }) => {
         onChangeEmail={handleChangeEmail}
         onChangePassword={handleChangePassword}
         onDeleteAccount={handleDeleteAccount}
+      />
+
+      {/* Follow List Modal */}
+      <FollowListModal
+        visible={followListVisible}
+        onClose={() => setFollowListVisible(false)}
+        userId={user?.id}
+        currentUserId={user?.id}
+        type={followListType}
+        onUserPress={handleUserPress}
       />
 
       {/* Uploading Overlay */}

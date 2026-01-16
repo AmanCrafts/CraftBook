@@ -15,11 +15,13 @@ import postAPI from "../../api/post.api";
 import userAPI from "../../api/user.api";
 import FollowButton from "../../components/common/FollowButton";
 import ArtistInfo from "../../components/profile/ArtistInfo";
+import FollowListModal from "../../components/profile/FollowListModal";
 import ProfileHeader from "../../components/profile/ProfileHeader";
 import ProfileInfo from "../../components/profile/ProfileInfo";
 import ProfilePostsGrid from "../../components/profile/ProfilePostsGrid";
 import ProfileStats from "../../components/profile/ProfileStats";
 import COLORS from "../../constants/colors";
+import ROUTES from "../../constants/routes";
 import { useAuth } from "../../contexts/AuthContext";
 
 const UserProfileScreen = ({ route, navigation }) => {
@@ -29,6 +31,8 @@ const UserProfileScreen = ({ route, navigation }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [followListVisible, setFollowListVisible] = useState(false);
+  const [followListType, setFollowListType] = useState("followers");
   const [stats, setStats] = useState({
     posts: 0,
     followers: 0,
@@ -113,6 +117,23 @@ const UserProfileScreen = ({ route, navigation }) => {
     Alert.alert("Coming Soon", "Messaging feature will be available soon!");
   };
 
+  const handleFollowersPress = () => {
+    setFollowListType("followers");
+    setFollowListVisible(true);
+  };
+
+  const handleFollowingPress = () => {
+    setFollowListType("following");
+    setFollowListVisible(true);
+  };
+
+  const handleUserPress = (pressedUserId) => {
+    // Navigate to the pressed user's profile
+    if (pressedUserId !== userId) {
+      navigation.push(ROUTES.USER_PROFILE, { userId: pressedUserId });
+    }
+  };
+
   // Parse art styles from medium if available
   const getArtStyles = () => {
     if (!user?.medium) return [];
@@ -177,6 +198,8 @@ const UserProfileScreen = ({ route, navigation }) => {
           posts={stats.posts}
           followers={stats.followers}
           following={stats.following}
+          onFollowersPress={handleFollowersPress}
+          onFollowingPress={handleFollowingPress}
         />
 
         {/* Action Buttons for Other Users */}
@@ -237,6 +260,16 @@ const UserProfileScreen = ({ route, navigation }) => {
         {/* Spacer at bottom */}
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {/* Follow List Modal */}
+      <FollowListModal
+        visible={followListVisible}
+        onClose={() => setFollowListVisible(false)}
+        userId={userId}
+        currentUserId={currentUser?.id}
+        type={followListType}
+        onUserPress={handleUserPress}
+      />
     </View>
   );
 };

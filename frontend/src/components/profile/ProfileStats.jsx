@@ -1,22 +1,52 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import COLORS from "../../constants/colors";
 
 // Profile Stats Component
-const ProfileStats = ({ posts = 0, followers = 0, following = 0 }) => {
-  const StatItem = ({ label, value }) => (
-    <View style={styles.statItem}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
+const ProfileStats = ({
+  posts = 0,
+  followers = 0,
+  following = 0,
+  onFollowersPress,
+  onFollowingPress,
+}) => {
+  const StatItem = ({ label, value, onPress }) => {
+    const content = (
+      <>
+        <Text style={styles.statValue}>{value}</Text>
+        <Text style={styles.statLabel}>{label}</Text>
+      </>
+    );
+
+    if (onPress) {
+      return (
+        <TouchableOpacity
+          style={styles.statItem}
+          onPress={onPress}
+          activeOpacity={0.7}
+        >
+          {content}
+        </TouchableOpacity>
+      );
+    }
+
+    return <View style={styles.statItem}>{content}</View>;
+  };
 
   return (
     <View style={styles.container}>
       <StatItem label="Posts" value={posts} />
       <View style={styles.divider} />
-      <StatItem label="Followers" value={followers} />
+      <StatItem
+        label="Followers"
+        value={followers}
+        onPress={onFollowersPress}
+      />
       <View style={styles.divider} />
-      <StatItem label="Following" value={following} />
+      <StatItem
+        label="Following"
+        value={following}
+        onPress={onFollowingPress}
+      />
     </View>
   );
 };
