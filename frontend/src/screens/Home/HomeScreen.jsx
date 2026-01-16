@@ -13,6 +13,7 @@ import {
 import { likeAPI } from "../../api/like.api";
 import PostCard from "../../components/common/PostCard";
 import COLORS from "../../constants/colors";
+import ROUTES from "../../constants/routes";
 import { useAuth } from "../../contexts/AuthContext";
 
 const HomeScreen = ({ navigation }) => {
@@ -84,6 +85,12 @@ const HomeScreen = ({ navigation }) => {
 
   const handleCommentPress = (post) => {
     navigation.navigate("PostDetail", { postId: post.id });
+  };
+
+  const handleProfilePress = (userId) => {
+    if (userId) {
+      navigation.navigate(ROUTES.USER_PROFILE, { userId });
+    }
   };
 
   const getFilterIcon = (filterType) => {
@@ -164,6 +171,7 @@ const HomeScreen = ({ navigation }) => {
             post={item}
             onPress={() => handleCommentPress(item)}
             onCommentPress={() => handleCommentPress(item)}
+            onProfilePress={handleProfilePress}
             userId={currentUserId}
             initialLiked={likedPosts[item.id] || false}
           />

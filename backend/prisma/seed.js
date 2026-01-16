@@ -425,7 +425,7 @@ async function main() {
           isProcessPost: Math.random() > 0.8, // 20% chance of being a process post
           authorId: user.id,
           createdAt: new Date(
-            Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000
+            Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000,
           ), // Random date within last 90 days
         },
       });
@@ -485,7 +485,7 @@ async function main() {
           postId: post.id,
           createdAt: new Date(
             new Date(post.createdAt).getTime() +
-              Math.random() * 7 * 24 * 60 * 60 * 1000
+              Math.random() * 7 * 24 * 60 * 60 * 1000,
           ), // Within a week of post
         },
       });

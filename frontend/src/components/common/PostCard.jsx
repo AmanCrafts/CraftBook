@@ -15,7 +15,14 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const MAX_IMAGE_HEIGHT = 500;
 const MIN_IMAGE_HEIGHT = 200;
 
-const PostCard = ({ post, onPress, onCommentPress, userId, initialLiked }) => {
+const PostCard = ({
+  post,
+  onPress,
+  onCommentPress,
+  onProfilePress,
+  userId,
+  initialLiked,
+}) => {
   const [imageHeight, setImageHeight] = useState(300);
 
   useEffect(() => {
@@ -52,7 +59,11 @@ const PostCard = ({ post, onPress, onCommentPress, userId, initialLiked }) => {
       </TouchableOpacity>
       <View style={styles.content}>
         <View style={styles.header}>
-          <View style={styles.artistInfo}>
+          <TouchableOpacity
+            style={styles.artistInfo}
+            onPress={() => onProfilePress?.(post.author?.id)}
+            activeOpacity={0.7}
+          >
             <Image
               source={{
                 uri:
@@ -67,7 +78,7 @@ const PostCard = ({ post, onPress, onCommentPress, userId, initialLiked }) => {
               </Text>
               <Text style={styles.medium}>{post.medium || "Mixed Media"}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.title}>{post.title}</Text>

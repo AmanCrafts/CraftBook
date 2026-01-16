@@ -7,6 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 import LoginScreen from "../screens/Auth/LoginScreen";
 import PostDetailScreen from "../screens/PostDetail/PostDetailScreen";
 import CompleteProfileScreen from "../screens/Profile/CompleteProfileScreen";
+import UserProfileScreen from "../screens/Profile/UserProfileScreen";
 import MainNavigator from "./MainNavigator";
 
 const Stack = createStackNavigator();
@@ -73,6 +74,13 @@ const AppNavigator = () => {
       <Stack.Screen
         name="PostDetail"
         component={PostDetailScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name={ROUTES.USER_PROFILE}
+        component={UserProfileScreen}
         options={{
           headerShown: false,
         }}

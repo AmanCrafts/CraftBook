@@ -12,6 +12,9 @@ export const ROUTES = {
   HOME: "Home",
   UPLOAD: "Upload",
   PROFILE: "Profile",
+
+  // Profile
+  USER_PROFILE: "UserProfile",
 };
 
 export default ROUTES;

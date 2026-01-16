@@ -16,6 +16,7 @@ import postAPI from "../../api/post.api";
 import CommentSection from "../../components/common/CommentSection";
 import LikeButton from "../../components/common/LikeButton";
 import COLORS from "../../constants/colors";
+import ROUTES from "../../constants/routes";
 import { useAuth } from "../../contexts/AuthContext";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -54,6 +55,12 @@ const PostDetailScreen = ({ route, navigation }) => {
 
   const handleShare = () => {
     Alert.alert("Share", "Share functionality coming soon!");
+  };
+
+  const handleProfilePress = () => {
+    if (post?.author?.id) {
+      navigation.navigate(ROUTES.USER_PROFILE, { userId: post.author.id });
+    }
   };
 
   if (loading) {
@@ -109,7 +116,11 @@ const PostDetailScreen = ({ route, navigation }) => {
         />
 
         <View style={styles.content}>
-          <View style={styles.authorSection}>
+          <TouchableOpacity
+            style={styles.authorSection}
+            onPress={handleProfilePress}
+            activeOpacity={0.7}
+          >
             <Image
               source={{
                 uri:
@@ -130,7 +141,8 @@ const PostDetailScreen = ({ route, navigation }) => {
                 })}
               </Text>
             </View>
-          </View>
+            <Ionicons name="chevron-forward" size={20} color={COLORS.gray400} />
+          </TouchableOpacity>
 
           <Text style={styles.title}>{post.title}</Text>
 

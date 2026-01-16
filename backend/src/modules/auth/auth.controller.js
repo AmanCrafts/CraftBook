@@ -73,7 +73,7 @@ export async function changeEmail(req, res) {
     const user = await authService.changeEmail(
       currentUser.id,
       newEmail,
-      currentPassword
+      currentPassword,
     );
     res.status(200).json(user);
   } catch (error) {
@@ -101,7 +101,7 @@ export async function changePassword(req, res) {
     const result = await authService.changePassword(
       currentUser.id,
       currentPassword,
-      newPassword
+      newPassword,
     );
     res.status(200).json(result);
   } catch (error) {

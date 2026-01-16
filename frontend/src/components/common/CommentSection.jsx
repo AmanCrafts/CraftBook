@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -14,12 +15,20 @@ import {
 } from "react-native";
 import commentAPI from "../../api/comment.api";
 import COLORS from "../../constants/colors";
+import ROUTES from "../../constants/routes";
 
 const CommentSection = ({ postId, currentUserId }) => {
+  const navigation = useNavigation();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+
+  const handleProfilePress = (userId) => {
+    if (userId) {
+      navigation.navigate(ROUTES.USER_PROFILE, { userId });
+    }
+  };
 
   const fetchComments = useCallback(async () => {
     try {
@@ -88,16 +97,28 @@ const CommentSection = ({ postId, currentUserId }) => {
 
     return (
       <View style={styles.commentItem}>
-        <Image
-          source={{
-            uri:
-              item.author?.profilePicture || "https://via.placeholder.com/40",
-          }}
-          style={styles.avatar}
-        />
+        <TouchableOpacity
+          onPress={() => handleProfilePress(item.authorId)}
+          activeOpacity={0.7}
+        >
+          <Image
+            source={{
+              uri:
+                item.author?.profilePicture || "https://via.placeholder.com/40",
+            }}
+            style={styles.avatar}
+          />
+        </TouchableOpacity>
         <View style={styles.commentContent}>
           <View style={styles.commentHeader}>
-            <Text style={styles.authorName}>{item.author?.name || "User"}</Text>
+            <TouchableOpacity
+              onPress={() => handleProfilePress(item.authorId)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.authorName}>
+                {item.author?.name || "User"}
+              </Text>
+            </TouchableOpacity>
             <Text style={styles.commentTime}>
               {new Date(item.createdAt).toLocaleDateString()}
             </Text>
