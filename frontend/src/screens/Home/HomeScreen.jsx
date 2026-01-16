@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -22,98 +22,186 @@ const HomeScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [filter, setFilter] = useState("recent");
   const [likedPosts, setLikedPosts] = useState({});
   const [followingStatus, setFollowingStatus] = useState({});
   const [hasNoFollowing, setHasNoFollowing] = useState(false);
   const currentUserId = user?.id;
 
-  const fetchPosts = useCallback(async () => {
-    try {
-      const API_URL = process.env.EXPO_PUBLIC_API_URL;
-      let data = [];
+  // Use refs for pagination state to avoid dependency issues and prevent re-renders
+  const cursorRef = useRef(null);
+  const pageRef = useRef(1);
+  const hasMoreRef = useRef(true);
+  const loadingMoreRef = useRef(false);
 
-      // Handle "following" filter
-      if (filter === "following" && currentUserId) {
-        // Fetch list of users the current user is following
-        const followingIds = await followAPI.getFollowingIds(currentUserId);
+  const fetchPosts = useCallback(
+    async (isLoadMore = false) => {
+      if (isLoadMore && !hasMoreRef.current) return;
+      if (isLoadMore && loadingMoreRef.current) return;
 
-        if (followingIds.length === 0) {
-          setHasNoFollowing(true);
-          setPosts([]);
-          setLoading(false);
-          setRefreshing(false);
-          return;
-        }
-
-        setHasNoFollowing(false);
-        // Fetch posts from followed users
-        data = await followAPI.getFollowingPosts(followingIds);
-      } else {
-        setHasNoFollowing(false);
-
-        // Fetch posts based on filter
-        let endpoint = "/api/posts/recent";
-        if (filter === "popular") {
-          endpoint = "/api/posts/popular";
-        }
-
-        const response = await fetch(`${API_URL}${endpoint}`);
-        data = await response.json();
-
-        if (!response.ok) {
-          console.error("Error fetching posts:", data.error);
-          data = [];
-        }
+      if (isLoadMore) {
+        loadingMoreRef.current = true;
+        setLoadingMore(true);
       }
 
-      setPosts(data);
+      try {
+        const API_URL = process.env.EXPO_PUBLIC_API_URL;
+        let data = [];
+        let newHasMore = false;
+        let newCursor = null;
 
-      // Fetch like status and following status for all posts
-      if (currentUserId && data.length > 0) {
-        const likeStatuses = {};
-        const authorIds = [
-          ...new Set(data.map((post) => post.author?.id).filter(Boolean)),
-        ];
+        // Handle "following" filter
+        if (filter === "following" && currentUserId) {
+          // Fetch list of users the current user is following
+          const followingIds = await followAPI.getFollowingIds(currentUserId);
 
-        // Batch check following status
-        let followStatuses = {};
-        if (authorIds.length > 0) {
-          followStatuses = await followAPI.checkFollowingBatch(
-            currentUserId,
-            authorIds
-          );
-        }
-        setFollowingStatus(followStatuses);
+          if (followingIds.length === 0) {
+            setHasNoFollowing(true);
+            setPosts([]);
+            hasMoreRef.current = false;
+            setLoading(false);
+            setRefreshing(false);
+            loadingMoreRef.current = false;
+            setLoadingMore(false);
+            return;
+          }
 
-        await Promise.all(
-          data.map(async (post) => {
-            try {
-              const liked = await likeAPI.checkUserLike(post.id, currentUserId);
-              likeStatuses[post.id] = liked;
-            } catch (error) {
-              console.error(`Error checking like for post ${post.id}:`, error);
-              likeStatuses[post.id] = false;
+          setHasNoFollowing(false);
+          // Fetch posts from followed users (no pagination for following filter)
+          data = await followAPI.getFollowingPosts(followingIds);
+          newHasMore = false;
+        } else {
+          setHasNoFollowing(false);
+
+          // Fetch posts based on filter with pagination
+          if (filter === "recent") {
+            const params = new URLSearchParams({ limit: "10" });
+            if (isLoadMore && cursorRef.current) {
+              params.append("cursor", cursorRef.current);
             }
-          })
-        );
-        setLikedPosts(likeStatuses);
+            const response = await fetch(
+              `${API_URL}/api/posts/recent?${params}`
+            );
+            const result = await response.json();
+
+            if (response.ok) {
+              data = result.posts || [];
+              newHasMore = result.hasMore || false;
+              newCursor = result.nextCursor || null;
+            }
+          } else if (filter === "popular") {
+            const currentPage = isLoadMore ? pageRef.current : 1;
+            const params = new URLSearchParams({
+              limit: "10",
+              page: currentPage.toString(),
+            });
+            const response = await fetch(
+              `${API_URL}/api/posts/popular?${params}`
+            );
+            const result = await response.json();
+
+            if (response.ok) {
+              data = result.posts || [];
+              newHasMore = result.hasMore || false;
+              if (isLoadMore) {
+                pageRef.current = currentPage + 1;
+              } else {
+                pageRef.current = 2;
+              }
+            }
+          }
+        }
+
+        if (isLoadMore) {
+          setPosts((prev) => [...prev, ...data]);
+        } else {
+          setPosts(data);
+        }
+
+        hasMoreRef.current = newHasMore;
+        cursorRef.current = newCursor;
+
+        // Fetch like status and following status for new posts
+        if (currentUserId && data.length > 0) {
+          const newLikeStatuses = {};
+          const authorIds = [
+            ...new Set(data.map((post) => post.author?.id).filter(Boolean)),
+          ];
+
+          // Batch check following status
+          let followStatuses = {};
+          if (authorIds.length > 0) {
+            followStatuses = await followAPI.checkFollowingBatch(
+              currentUserId,
+              authorIds
+            );
+          }
+
+          if (isLoadMore) {
+            setFollowingStatus((prev) => ({ ...prev, ...followStatuses }));
+          } else {
+            setFollowingStatus(followStatuses);
+          }
+
+          await Promise.all(
+            data.map(async (post) => {
+              try {
+                const liked = await likeAPI.checkUserLike(
+                  post.id,
+                  currentUserId
+                );
+                newLikeStatuses[post.id] = liked;
+              } catch (error) {
+                console.error(
+                  `Error checking like for post ${post.id}:`,
+                  error
+                );
+                newLikeStatuses[post.id] = false;
+              }
+            })
+          );
+
+          if (isLoadMore) {
+            setLikedPosts((prev) => ({ ...prev, ...newLikeStatuses }));
+          } else {
+            setLikedPosts(newLikeStatuses);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+        loadingMoreRef.current = false;
+        setLoadingMore(false);
       }
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [filter, currentUserId]);
+    },
+    [filter, currentUserId]
+  );
 
   useEffect(() => {
-    fetchPosts();
+    // Reset pagination state when filter changes
+    cursorRef.current = null;
+    pageRef.current = 1;
+    hasMoreRef.current = true;
+    setPosts([]);
+    setLoading(true);
+    fetchPosts(false);
   }, [fetchPosts]);
 
   const onRefresh = () => {
+    cursorRef.current = null;
+    pageRef.current = 1;
+    hasMoreRef.current = true;
     setRefreshing(true);
-    fetchPosts();
+    fetchPosts(false);
+  };
+
+  const loadMorePosts = () => {
+    if (!loadingMoreRef.current && hasMoreRef.current && !refreshing) {
+      fetchPosts(true);
+    }
   };
 
   const handleCommentPress = (post) => {
@@ -228,6 +316,16 @@ const HomeScreen = ({ navigation }) => {
             colors={[COLORS.primary]}
             tintColor={COLORS.primary}
           />
+        }
+        onEndReached={loadMorePosts}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          loadingMore ? (
+            <View style={styles.loadingMoreContainer}>
+              <ActivityIndicator size="small" color={COLORS.primary} />
+              <Text style={styles.loadingMoreText}>Loading more posts...</Text>
+            </View>
+          ) : null
         }
         ListEmptyComponent={
           filter === "following" && hasNoFollowing ? (
@@ -369,6 +467,17 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 16,
     fontWeight: "600",
+  },
+  loadingMoreContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 20,
+    gap: 10,
+  },
+  loadingMoreText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
 });
 
