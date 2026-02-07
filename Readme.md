@@ -243,6 +243,7 @@ A mobile and web platform that:
 5. **Post Feed** — View recent and popular artwork posts with filtering
 6. **Profile Editing** — Full-screen modal for updating profile information
 7. **Responsive UI** — Modern gradient headers, icons, and smooth transitions
+8. **Explore & Discover** — Search artwork by title, tags, or description with medium filter chips and a visual grid layout
 
 ### Planned Features 🚧
 
@@ -250,7 +251,7 @@ A mobile and web platform that:
 2. **Process Stages & Time-lapse** — Multi-step posts that show evolution from sketch to final
 3. **Annotation Critique Mode** — Draw-on-image feedback (public or private) with versioned replies
 4. **Commission & Storefront** — Commission requests, direct sales, and order tracking
-5. **Explore by Medium & Curated Challenges** — Powerful filters and community-driven events
+5. **Curated Challenges** — Community-driven art events and challenges
 6. **Collab Board & Matchmaking** — Post project invites and find collaborators by skill and style
 
 ---
