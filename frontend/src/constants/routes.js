@@ -10,6 +10,7 @@ export const ROUTES = {
 
   // Tab Navigation
   HOME: "Home",
+  EXPLORE: "Explore",
   UPLOAD: "Upload",
   PROFILE: "Profile",
 

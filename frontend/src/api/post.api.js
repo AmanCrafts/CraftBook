@@ -43,6 +43,31 @@ export const postAPI = {
   deletePost: async (id) => {
     return await httpClient.delete(API_ENDPOINTS.POST_BY_ID(id));
   },
+
+  // Search posts (unified search with optional medium filter)
+  searchPosts: async ({ query = "", medium = null, limit = 20, page = 1 } = {}) => {
+    const params = new URLSearchParams();
+    if (query) params.append("q", query);
+    if (medium) params.append("medium", medium);
+    params.append("limit", limit.toString());
+    params.append("page", page.toString());
+    return await httpClient.get(`${API_ENDPOINTS.POSTS_SEARCH}?${params}`);
+  },
+
+  // Get distinct mediums
+  getDistinctMediums: async () => {
+    return await httpClient.get(API_ENDPOINTS.POSTS_MEDIUMS);
+  },
+
+  // Get posts by tag
+  getPostsByTag: async (tag) => {
+    return await httpClient.get(API_ENDPOINTS.POSTS_BY_TAG(tag));
+  },
+
+  // Get posts by medium
+  getPostsByMedium: async (medium) => {
+    return await httpClient.get(API_ENDPOINTS.POSTS_BY_MEDIUM(medium));
+  },
 };
 
 export default postAPI;

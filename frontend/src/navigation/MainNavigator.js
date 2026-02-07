@@ -4,6 +4,7 @@ import COLORS from "../constants/colors";
 import ROUTES from "../constants/routes";
 
 // Import screens
+import ExploreScreen from "../screens/Explore/ExploreScreen";
 import HomeScreen from "../screens/Home/HomeScreen";
 import ProfileScreen from "../screens/Profile/ProfileScreen";
 import UploadScreen from "../screens/Upload/UploadScreen";
@@ -41,6 +42,8 @@ const MainNavigator = () => {
 
           if (route.name === ROUTES.HOME) {
             iconName = focused ? "home" : "home-outline";
+          } else if (route.name === ROUTES.EXPLORE) {
+            iconName = focused ? "compass" : "compass-outline";
           } else if (route.name === ROUTES.UPLOAD) {
             iconName = focused ? "add-circle" : "add-circle-outline";
           } else if (route.name === ROUTES.PROFILE) {
@@ -56,6 +59,13 @@ const MainNavigator = () => {
         component={HomeScreen}
         options={{
           tabBarLabel: "Home",
+        }}
+      />
+      <Tab.Screen
+        name={ROUTES.EXPLORE}
+        component={ExploreScreen}
+        options={{
+          tabBarLabel: "Explore",
         }}
       />
       <Tab.Screen

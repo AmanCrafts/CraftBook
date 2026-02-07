@@ -19,6 +19,8 @@ export const API_ENDPOINTS = {
   POSTS_BY_USER: (userId) => `/api/posts/user/${userId}`,
   POSTS_BY_TAG: (tag) => `/api/posts/tag/${tag}`,
   POSTS_BY_MEDIUM: (medium) => `/api/posts/medium/${medium}`,
+  POSTS_SEARCH: "/api/posts/search",
+  POSTS_MEDIUMS: "/api/posts/mediums",
 
   // Upload Endpoints
   UPLOAD_IMAGE: "/api/upload",
