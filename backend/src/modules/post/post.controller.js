@@ -278,6 +278,46 @@ export async function getFollowingPosts(req, res, _next) {
   }
 }
 
+/**
+ * Unified search posts
+ * GET /api/posts/search?q=...&medium=...&limit=20&page=1
+ */
+export async function searchPosts(req, res, _next) {
+  try {
+    const { q, medium, limit = 20, page = 1 } = req.query;
+    const result = await postService.searchPosts({
+      query: q || "",
+      medium: medium || null,
+      limit: parseInt(limit, 10),
+      page: parseInt(page, 10),
+    });
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error searching posts:", error);
+    res.status(500).json({
+      error: "Error searching posts",
+      details: error.message,
+    });
+  }
+}
+
+/**
+ * Get distinct mediums
+ * GET /api/posts/mediums
+ */
+export async function getDistinctMediums(_req, res, _next) {
+  try {
+    const mediums = await postService.getDistinctMediums();
+    res.status(200).json(mediums);
+  } catch (error) {
+    console.error("Error fetching mediums:", error);
+    res.status(500).json({
+      error: "Error fetching mediums",
+      details: error.message,
+    });
+  }
+}
+
 // Default export for compatibility
 export default {
   createPost,
@@ -293,6 +333,8 @@ export default {
   getPopularPosts,
   getProcessPosts,
   getFollowingPosts,
+  searchPosts,
+  getDistinctMediums,
   updatePost,
   deletePost,
 };

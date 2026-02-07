@@ -151,6 +151,20 @@ export async function deletePost(id) {
   return await postRepository.delete(id);
 }
 
+/**
+ * Unified search posts
+ */
+export async function searchPosts({ query, medium, limit, page } = {}) {
+  return await postRepository.search({ query, medium, limit, page });
+}
+
+/**
+ * Get distinct mediums
+ */
+export async function getDistinctMediums() {
+  return await postRepository.getDistinctMediums();
+}
+
 // Default export for compatibility
 export default {
   createPost,
@@ -166,6 +180,8 @@ export default {
   getPopularPosts,
   getProcessPosts,
   getFollowingPosts,
+  searchPosts,
+  getDistinctMediums,
   updatePost,
   deletePost,
 };

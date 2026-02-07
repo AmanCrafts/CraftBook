@@ -289,6 +289,65 @@ export async function findFollowingPosts(userIds) {
   });
 }
 
+/**
+ * Unified search across title, description, and tags with optional medium filter
+ */
+export async function search({ query = "", medium = null, limit = 20, page = 1 } = {}) {
+  const skip = (page - 1) * limit;
+
+  const where = {};
+
+  // Text search across title, description, and tags
+  if (query) {
+    where.OR = [
+      { title: { contains: query, mode: "insensitive" } },
+      { description: { contains: query, mode: "insensitive" } },
+      { tags: { contains: query, mode: "insensitive" } },
+    ];
+  }
+
+  // Optional medium filter
+  if (medium) {
+    where.medium = { equals: medium, mode: "insensitive" };
+  }
+
+  const [posts, total] = await Promise.all([
+    prisma.post.findMany({
+      where,
+      take: limit,
+      skip,
+      include: {
+        author: true,
+        _count: {
+          select: { likes: true, comments: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.post.count({ where }),
+  ]);
+
+  return {
+    posts,
+    total,
+    page,
+    hasMore: skip + posts.length < total,
+  };
+}
+
+/**
+ * Get distinct mediums used in posts
+ */
+export async function getDistinctMediums() {
+  const posts = await prisma.post.findMany({
+    where: { medium: { not: null } },
+    select: { medium: true },
+    distinct: ["medium"],
+    orderBy: { medium: "asc" },
+  });
+  return posts.map((p) => p.medium).filter(Boolean);
+}
+
 // Default export for compatibility
 export default {
   create,
@@ -304,6 +363,8 @@ export default {
   findPopular,
   findProcessPosts,
   findFollowingPosts,
+  search,
+  getDistinctMediums,
   update,
   delete: deletePost,
 };

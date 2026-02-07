@@ -19,6 +19,12 @@ router.get("/popular", postController.getPopularPosts);
 // GET /api/posts/process - Get process posts
 router.get("/process", postController.getProcessPosts);
 
+// GET /api/posts/search - Unified search posts
+router.get("/search", postController.searchPosts);
+
+// GET /api/posts/mediums - Get distinct mediums
+router.get("/mediums", postController.getDistinctMediums);
+
 // POST /api/posts/following - Get posts from followed users
 router.post("/following", postController.getFollowingPosts);
 
