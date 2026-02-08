@@ -3,31 +3,31 @@ import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Dimensions,
   Image,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 import likeAPI from "../../api/like.api";
 import postAPI from "../../api/post.api";
 import CommentSection from "../../components/common/CommentSection";
 import LikeButton from "../../components/common/LikeButton";
-import ProcessStagesViewer from "../../components/common/ProcessStagesViewer";
 import COLORS from "../../constants/colors";
 import ROUTES from "../../constants/routes";
 import { useAuth } from "../../contexts/AuthContext";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
 const PostDetailScreen = ({ route, navigation }) => {
   const { postId } = route.params;
   const { user: currentUser } = useAuth();
+  const { width: screenWidth } = useWindowDimensions();
   const [post, setPost] = useState(null);
   const [hasLiked, setHasLiked] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [imageAspectRatio, setImageAspectRatio] = useState(4 / 5);
 
   const loadData = useCallback(async () => {
     try {
@@ -54,6 +54,22 @@ const PostDetailScreen = ({ route, navigation }) => {
     loadData();
   }, [loadData]);
 
+  // Measure main image aspect ratio
+  useEffect(() => {
+    if (post?.imageUrl) {
+      Image.getSize(
+        post.imageUrl,
+        (w, h) => {
+          if (w > 0 && h > 0) {
+            const ratio = Math.min(2, Math.max(0.5, w / h));
+            setImageAspectRatio(ratio);
+          }
+        },
+        () => { },
+      );
+    }
+  }, [post?.imageUrl]);
+
   const handleShare = () => {
     Alert.alert("Share", "Share functionality coming soon!");
   };
@@ -62,6 +78,102 @@ const PostDetailScreen = ({ route, navigation }) => {
     if (post?.author?.id) {
       navigation.navigate(ROUTES.USER_PROFILE, { userId: post.author.id });
     }
+  };
+
+  // Build carousel data: main image + up to 7 process stages
+  const buildCarousel = () => {
+    if (!post) return [];
+    const slides = [{ imageUrl: post.imageUrl, stageLabel: null }];
+    if (
+      post.isProcessPost &&
+      post.processStages &&
+      Array.isArray(post.processStages)
+    ) {
+      const stages = post.processStages.slice(0, 7);
+      for (const stage of stages) {
+        if (stage.imageUrl) {
+          slides.push({
+            imageUrl: stage.imageUrl,
+            stageLabel: stage.label || null,
+          });
+        }
+      }
+    }
+    return slides;
+  };
+
+  const carouselData = post ? buildCarousel() : [];
+  const isCarousel = carouselData.length > 1;
+
+  const handleCarouselScroll = useCallback(
+    (e) => {
+      const offsetX = e.nativeEvent.contentOffset.x;
+      const index = Math.round(offsetX / screenWidth);
+      setActiveIndex(index);
+    },
+    [screenWidth],
+  );
+
+  const renderImageCarousel = () => {
+    const imgWidth = screenWidth;
+    const imgHeight = Math.round(imgWidth / imageAspectRatio);
+
+    if (!isCarousel) {
+      return (
+        <Image
+          source={{ uri: post.imageUrl }}
+          style={{ width: imgWidth, height: imgHeight, backgroundColor: COLORS.gray200 }}
+          resizeMode="cover"
+        />
+      );
+    }
+
+    return (
+      <View style={[styles.carouselContainer, { height: imgHeight }]}>
+        <ScrollView
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          bounces={false}
+          decelerationRate="fast"
+          onScroll={handleCarouselScroll}
+          scrollEventThrottle={16}
+        >
+          {carouselData.map((slide, idx) => (
+            <View key={`detail-slide-${idx}`} style={{ width: imgWidth, height: imgHeight }}>
+              <Image
+                source={{ uri: slide.imageUrl }}
+                style={{ width: imgWidth, height: imgHeight }}
+                resizeMode="cover"
+              />
+              {slide.stageLabel && (
+                <View style={styles.stageLabelOverlay}>
+                  <Text style={styles.stageLabelText}>{slide.stageLabel}</Text>
+                </View>
+              )}
+            </View>
+          ))}
+        </ScrollView>
+        {/* Counter badge */}
+        <View style={styles.counterBadge}>
+          <Text style={styles.counterText}>
+            {activeIndex + 1}/{carouselData.length}
+          </Text>
+        </View>
+        {/* Dot indicators */}
+        <View style={styles.dotContainer}>
+          {carouselData.map((_, idx) => (
+            <View
+              key={`dot-${idx}`}
+              style={[
+                styles.dot,
+                idx === activeIndex ? styles.dotActive : styles.dotInactive,
+              ]}
+            />
+          ))}
+        </View>
+      </View>
+    );
   };
 
   if (loading) {
@@ -110,21 +222,7 @@ const PostDetailScreen = ({ route, navigation }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}
       >
-        <Image
-          source={{ uri: post.imageUrl }}
-          style={styles.postImage}
-          resizeMode="cover"
-        />
-
-        {/* Process Stages Viewer */}
-        {post.isProcessPost &&
-          post.processStages &&
-          post.processStages.length > 0 && (
-            <ProcessStagesViewer
-              stages={post.processStages}
-              mainImageUrl={post.imageUrl}
-            />
-          )}
+        {renderImageCarousel()}
 
         <View style={styles.content}>
           <TouchableOpacity
@@ -266,10 +364,59 @@ const styles = StyleSheet.create({
   shareButton: {
     padding: 8,
   },
-  postImage: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_WIDTH,
+  carouselContainer: {
+    width: "100%",
+    overflow: "hidden",
     backgroundColor: COLORS.gray200,
+  },
+  stageLabelOverlay: {
+    position: "absolute",
+    bottom: 12,
+    left: 12,
+    backgroundColor: "rgba(0, 0, 0, 0.65)",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+  },
+  stageLabelText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: COLORS.white,
+  },
+  counterBadge: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  counterText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: COLORS.white,
+  },
+  dotContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 10,
+    gap: 5,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  dotActive: {
+    backgroundColor: COLORS.primary,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+  },
+  dotInactive: {
+    backgroundColor: COLORS.gray300,
   },
   content: {
     padding: 20,

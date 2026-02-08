@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
   },
   listContent: {
-    padding: 16,
+    paddingVertical: 8,
   },
   emptyContainer: {
     alignItems: "center",
