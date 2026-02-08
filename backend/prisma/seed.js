@@ -353,19 +353,19 @@ function shuffleArray(array) {
 }
 
 async function main() {
-  console.log("🌱 Starting database seed...\n");
+  console.log("Starting database seed...\n");
 
   // Clear existing data
-  console.log("🗑️  Clearing existing data...");
+  console.log("Clearing existing data...");
   await prisma.like.deleteMany();
   await prisma.comment.deleteMany();
   await prisma.follow.deleteMany();
   await prisma.post.deleteMany();
   await prisma.user.deleteMany();
-  console.log("✅ Existing data cleared\n");
+  console.log("Existing data cleared\n");
 
   // Create 50 users
-  console.log("👥 Creating 50 users...");
+  console.log("Creating 50 users...");
   const hashedPassword = await bcrypt.hash("password123", 10);
   const users = [];
 
@@ -389,10 +389,29 @@ async function main() {
     users.push(user);
     process.stdout.write(`\r  Created user ${i + 1}/50: ${name}`);
   }
-  console.log("\n✅ 50 users created\n");
+  console.log("\n50 users created\n");
+
+  // Stage labels for process posts
+  const stageLabels = [
+    "Concept / Reference",
+    "Rough Sketch",
+    "Line Art",
+    "Base Colors",
+    "Shading & Details",
+    "Final Piece",
+  ];
+
+  const stageDescriptions = [
+    "Initial concept and reference gathering",
+    "Quick sketch to establish composition",
+    "Clean line work and structure",
+    "First layer of color blocking",
+    "Adding depth, shadows, and highlights",
+    "Final touches and refinements",
+  ];
 
   // Create posts for each user (10-15 posts each)
-  console.log("🎨 Creating posts with artistic images...");
+  console.log("Creating posts with artistic images...");
   const allPosts = [];
   let postIndex = 0;
 
@@ -415,6 +434,25 @@ async function main() {
         imageUrl = `https://picsum.photos/seed/art${postIndex}/800/600`;
       }
 
+      const isProcess = Math.random() > 0.7; // 30% chance of being a process post
+      let processStages = null;
+
+      // Create process stages for process posts
+      if (isProcess) {
+        const numStages = getRandomInt(3, 6); // 3 to 6 stages
+        processStages = [];
+        
+        for (let k = 0; k < numStages; k++) {
+          // Use different seeds for stage images to show progression
+          const stageImageUrl = `https://picsum.photos/seed/stage${postIndex}_${k}/800/600`;
+          processStages.push({
+            imageUrl: stageImageUrl,
+            label: stageLabels[k] || `Stage ${k + 1}`,
+            description: stageDescriptions[k] || "",
+          });
+        }
+      }
+
       const post = await prisma.post.create({
         data: {
           title: `${title} #${postIndex + 1}`,
@@ -422,7 +460,8 @@ async function main() {
           imageUrl,
           tags: `${category},art,creative,${getRandomElement(artMediums).toLowerCase().replace(" ", "")}`,
           medium: getRandomElement(artMediums),
-          isProcessPost: Math.random() > 0.8, // 20% chance of being a process post
+          isProcessPost: isProcess,
+          processStages: processStages,
           authorId: user.id,
           createdAt: new Date(
             Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000,
@@ -434,10 +473,10 @@ async function main() {
     }
     process.stdout.write(`\r  Created posts for user ${i + 1}/50`);
   }
-  console.log(`\n✅ ${allPosts.length} posts created\n`);
+  console.log(`\n${allPosts.length} posts created (${allPosts.filter(p => p.isProcessPost).length} with process stages)\n`);
 
   // Create likes (each post gets 5-30 random likes)
-  console.log("❤️  Adding likes to posts...");
+  console.log("Adding likes to posts...");
   let likeCount = 0;
 
   for (let i = 0; i < allPosts.length; i++) {
@@ -465,10 +504,10 @@ async function main() {
       process.stdout.write(`\r  Processing post ${i + 1}/${allPosts.length}`);
     }
   }
-  console.log(`\n✅ ${likeCount} likes added\n`);
+  console.log(`\n${likeCount} likes added\n`);
 
   // Create comments (each post gets 2-10 random comments)
-  console.log("💬 Adding comments to posts...");
+  console.log("Adding comments to posts...");
   let commentCount = 0;
 
   for (let i = 0; i < allPosts.length; i++) {
@@ -495,10 +534,10 @@ async function main() {
       process.stdout.write(`\r  Processing post ${i + 1}/${allPosts.length}`);
     }
   }
-  console.log(`\n✅ ${commentCount} comments added\n`);
+  console.log(`\n${commentCount} comments added\n`);
 
   // Create some follows between users
-  console.log("🤝 Creating follow relationships...");
+  console.log("Creating follow relationships...");
   let followCount = 0;
 
   for (const user of users) {
@@ -522,19 +561,19 @@ async function main() {
       }
     }
   }
-  console.log(`✅ ${followCount} follow relationships created\n`);
+  console.log(`${followCount} follow relationships created\n`);
 
   // Summary
   console.log("═".repeat(50));
-  console.log("🎉 Database seeding completed!");
+  console.log("Database seeding completed!");
   console.log("═".repeat(50));
-  console.log(`👥 Users: 50`);
-  console.log(`🎨 Posts: ${allPosts.length}`);
-  console.log(`❤️  Likes: ${likeCount}`);
-  console.log(`💬 Comments: ${commentCount}`);
-  console.log(`🤝 Follows: ${followCount}`);
+  console.log(`Users: 50`);
+  console.log(`Posts: ${allPosts.length}`);
+  console.log(`Likes: ${likeCount}`);
+  console.log(`Comments: ${commentCount}`);
+  console.log(`Follows: ${followCount}`);
   console.log("═".repeat(50));
-  console.log("\n📝 Test credentials:");
+  console.log("\nTest credentials:");
   console.log("   Email: emma.smith@example.com");
   console.log("   Password: password123");
   console.log("═".repeat(50));
@@ -542,7 +581,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error("❌ Error seeding database:", e);
+    console.error("Error seeding database:", e);
     process.exit(1);
   })
   .finally(async () => {
