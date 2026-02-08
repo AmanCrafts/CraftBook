@@ -60,6 +60,12 @@ const PostCard = ({
           style={[styles.image, { height: imageHeight }]}
           resizeMode="cover"
         />
+        {post.isProcessPost && (
+          <View style={styles.processBadge}>
+            <Ionicons name="layers" size={14} color={COLORS.white} />
+            <Text style={styles.processBadgeText}>Process</Text>
+          </View>
+        )}
       </TouchableOpacity>
       <View style={styles.content}>
         <View style={styles.header}>
@@ -151,6 +157,23 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     backgroundColor: COLORS.gray200,
+  },
+  processBadge: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(139, 92, 246, 0.85)",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
+    gap: 4,
+  },
+  processBadgeText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: COLORS.white,
   },
   content: {
     padding: 15,

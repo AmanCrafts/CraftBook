@@ -1,9 +1,13 @@
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -21,6 +25,17 @@ const UploadScreen = ({ navigation }) => {
   const [medium, setMedium] = useState("");
   const [tags, setTags] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isProcessPost, setIsProcessPost] = useState(false);
+  const [processStages, setProcessStages] = useState([]);
+
+  const STAGE_LABEL_OPTIONS = [
+    "Concept / Reference",
+    "Rough Sketch",
+    "Line Art",
+    "Base Colors",
+    "Shading & Details",
+    "Final Piece",
+  ];
 
   const mediumOptions = [
     "Pencil",
@@ -36,7 +51,7 @@ const UploadScreen = ({ navigation }) => {
 
   const handleUpload = async () => {
     if (!image) {
-      Alert.alert("Missing Image", "Please select an image to upload.");
+      Alert.alert("Missing Image", "Please select a main image to upload.");
       return;
     }
 
@@ -47,6 +62,14 @@ const UploadScreen = ({ navigation }) => {
 
     if (!medium) {
       Alert.alert("Missing Medium", "Please select the medium used.");
+      return;
+    }
+
+    if (isProcessPost && processStages.length < 2) {
+      Alert.alert(
+        "Need More Stages",
+        "A process post needs at least 2 stages to show your creative journey."
+      );
       return;
     }
 
@@ -61,14 +84,10 @@ const UploadScreen = ({ navigation }) => {
 
       const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-      // Upload image to Supabase via backend
+      // Upload main image to Supabase via backend
       const formData = new FormData();
-
-      // Get the filename from the URI
       const uriParts = image.split("/");
       const fileName = uriParts[uriParts.length - 1];
-
-      // Create the file object for FormData
       formData.append("image", {
         uri: image,
         type: "image/jpeg",
@@ -91,9 +110,43 @@ const UploadScreen = ({ navigation }) => {
         return;
       }
 
-      // Create post with the uploaded image URL
       const imageUrl = uploadData.image.url;
 
+      // Upload process stage images if it's a process post
+      let uploadedStages = null;
+      if (isProcessPost && processStages.length > 0) {
+        uploadedStages = [];
+        for (const stage of processStages) {
+          const stageFormData = new FormData();
+          const stageUriParts = stage.imageUri.split("/");
+          const stageFileName = stageUriParts[stageUriParts.length - 1];
+          stageFormData.append("image", {
+            uri: stage.imageUri,
+            type: "image/jpeg",
+            name: stageFileName,
+          });
+
+          const stageUploadResponse = await fetch(`${API_URL}/api/upload`, {
+            method: "POST",
+            body: stageFormData,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
+
+          const stageUploadData = await stageUploadResponse.json();
+
+          if (stageUploadResponse.ok) {
+            uploadedStages.push({
+              imageUrl: stageUploadData.image.url,
+              label: stage.label,
+              description: stage.description || "",
+            });
+          }
+        }
+      }
+
+      // Create post with the uploaded image URL
       const postData = {
         authorId: user.id,
         title: title.trim(),
@@ -104,6 +157,8 @@ const UploadScreen = ({ navigation }) => {
           .split(",")
           .map((tag) => tag.trim())
           .join(","),
+        isProcessPost: isProcessPost && uploadedStages && uploadedStages.length > 0,
+        processStages: uploadedStages,
       };
 
       const response = await fetch(`${API_URL}/api/posts`, {
@@ -127,6 +182,8 @@ const UploadScreen = ({ navigation }) => {
               setDescription("");
               setMedium("");
               setTags("");
+              setIsProcessPost(false);
+              setProcessStages([]);
               navigation.navigate("Home");
             },
           },
@@ -213,6 +270,161 @@ const UploadScreen = ({ navigation }) => {
             value={tags}
             onChangeText={setTags}
           />
+
+          {/* Process Post Toggle */}
+          <View style={styles.processToggleContainer}>
+            <View style={styles.processToggleLeft}>
+              <Ionicons
+                name="layers-outline"
+                size={22}
+                color={isProcessPost ? COLORS.accent : COLORS.textSecondary}
+              />
+              <View style={styles.processToggleTextContainer}>
+                <Text style={styles.processToggleTitle}>Process Post</Text>
+                <Text style={styles.processToggleSubtitle}>
+                  Show your creative journey step by step
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={isProcessPost}
+              onValueChange={setIsProcessPost}
+              trackColor={{
+                false: COLORS.gray300,
+                true: COLORS.accentLight,
+              }}
+              thumbColor={isProcessPost ? COLORS.accent : COLORS.gray400}
+            />
+          </View>
+
+          {/* Process Stages */}
+          {isProcessPost && (
+            <View style={styles.processStagesSection}>
+              <Text style={styles.processSectionTitle}>
+                Add Stages ({processStages.length}/6)
+              </Text>
+              <Text style={styles.processSectionSubtitle}>
+                Add images showing each step of your process (min 2)
+              </Text>
+
+              {/* Existing Stages */}
+              {processStages.map((stage, index) => (
+                <View key={`stage-${index}`} style={styles.stageItem}>
+                  <Image
+                    source={{ uri: stage.imageUri }}
+                    style={styles.stageThumb}
+                  />
+                  <View style={styles.stageInfo}>
+                    <Text style={styles.stageLabel} numberOfLines={1}>
+                      {stage.label}
+                    </Text>
+                    {stage.description ? (
+                      <Text
+                        style={styles.stageDescription}
+                        numberOfLines={1}
+                      >
+                        {stage.description}
+                      </Text>
+                    ) : null}
+                  </View>
+                  <TouchableOpacity
+                    style={styles.removeStageBtn}
+                    onPress={() => {
+                      setProcessStages((prev) =>
+                        prev.filter((_, i) => i !== index)
+                      );
+                    }}
+                  >
+                    <Ionicons
+                      name="close-circle"
+                      size={24}
+                      color={COLORS.error}
+                    />
+                  </TouchableOpacity>
+                </View>
+              ))}
+
+              {/* Add Stage Button */}
+              {processStages.length < 6 && (
+                <TouchableOpacity
+                  style={styles.addStageButton}
+                  onPress={async () => {
+                    try {
+                      const { status } =
+                        await ImagePicker.requestMediaLibraryPermissionsAsync();
+                      if (status !== "granted") {
+                        Alert.alert(
+                          "Permission needed",
+                          "Please grant gallery permissions."
+                        );
+                        return;
+                      }
+
+                      const result =
+                        await ImagePicker.launchImageLibraryAsync({
+                          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                          allowsEditing: true,
+                          quality: 0.9,
+                        });
+
+                      if (!result.canceled && result.assets[0]) {
+                        // Show label picker
+                        const availableLabels = STAGE_LABEL_OPTIONS.filter(
+                          (l) =>
+                            !processStages.some((s) => s.label === l)
+                        );
+                        const defaultLabel =
+                          availableLabels[0] ||
+                          `Stage ${processStages.length + 1}`;
+
+                        Alert.prompt
+                          ? Alert.prompt(
+                              "Stage Label",
+                              "Enter a label for this stage:",
+                              [
+                                { text: "Cancel", style: "cancel" },
+                                {
+                                  text: "Add",
+                                  onPress: (label) => {
+                                    setProcessStages((prev) => [
+                                      ...prev,
+                                      {
+                                        imageUri: result.assets[0].uri,
+                                        label: label || defaultLabel,
+                                        description: "",
+                                      },
+                                    ]);
+                                  },
+                                },
+                              ],
+                              "plain-text",
+                              defaultLabel
+                            )
+                          : setProcessStages((prev) => [
+                              ...prev,
+                              {
+                                imageUri: result.assets[0].uri,
+                                label: defaultLabel,
+                                description: "",
+                              },
+                            ]);
+                      }
+                    } catch (error) {
+                      console.error("Error picking stage image:", error);
+                    }
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons
+                    name="add-circle-outline"
+                    size={24}
+                    color={COLORS.accent}
+                  />
+                  <Text style={styles.addStageText}>Add Stage Image</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
 
           <TouchableOpacity
             style={[
@@ -380,6 +592,105 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 18,
     fontWeight: "bold",
+  },
+  processToggleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: COLORS.gray50,
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: COLORS.gray200,
+  },
+  processToggleLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    gap: 12,
+  },
+  processToggleTextContainer: {
+    flex: 1,
+  },
+  processToggleTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: COLORS.text,
+  },
+  processToggleSubtitle: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  processStagesSection: {
+    marginTop: 16,
+    backgroundColor: COLORS.gray50,
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: COLORS.gray200,
+  },
+  processSectionTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: COLORS.text,
+    marginBottom: 4,
+  },
+  processSectionSubtitle: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginBottom: 16,
+  },
+  stageItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.white,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: COLORS.gray200,
+  },
+  stageThumb: {
+    width: 56,
+    height: 56,
+    borderRadius: 8,
+    backgroundColor: COLORS.gray200,
+  },
+  stageInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  stageLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: COLORS.text,
+  },
+  stageDescription: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  removeStageBtn: {
+    padding: 4,
+  },
+  addStageButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: COLORS.white,
+    borderRadius: 10,
+    padding: 14,
+    borderWidth: 2,
+    borderColor: COLORS.accentLight,
+    borderStyle: "dashed",
+    gap: 8,
+  },
+  addStageText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: COLORS.accent,
   },
 });
 

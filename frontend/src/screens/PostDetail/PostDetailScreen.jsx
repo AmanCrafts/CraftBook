@@ -15,6 +15,7 @@ import likeAPI from "../../api/like.api";
 import postAPI from "../../api/post.api";
 import CommentSection from "../../components/common/CommentSection";
 import LikeButton from "../../components/common/LikeButton";
+import ProcessStagesViewer from "../../components/common/ProcessStagesViewer";
 import COLORS from "../../constants/colors";
 import ROUTES from "../../constants/routes";
 import { useAuth } from "../../contexts/AuthContext";
@@ -114,6 +115,16 @@ const PostDetailScreen = ({ route, navigation }) => {
           style={styles.postImage}
           resizeMode="cover"
         />
+
+        {/* Process Stages Viewer */}
+        {post.isProcessPost &&
+          post.processStages &&
+          post.processStages.length > 0 && (
+            <ProcessStagesViewer
+              stages={post.processStages}
+              mainImageUrl={post.imageUrl}
+            />
+          )}
 
         <View style={styles.content}>
           <TouchableOpacity
