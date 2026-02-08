@@ -379,35 +379,35 @@ const UploadScreen = ({ navigation }) => {
 
                         Alert.prompt
                           ? Alert.prompt(
-                              "Stage Label",
-                              "Enter a label for this stage:",
-                              [
-                                { text: "Cancel", style: "cancel" },
-                                {
-                                  text: "Add",
-                                  onPress: (label) => {
-                                    setProcessStages((prev) => [
-                                      ...prev,
-                                      {
-                                        imageUri: result.assets[0].uri,
-                                        label: label || defaultLabel,
-                                        description: "",
-                                      },
-                                    ]);
-                                  },
-                                },
-                              ],
-                              "plain-text",
-                              defaultLabel
-                            )
-                          : setProcessStages((prev) => [
-                              ...prev,
+                            "Stage Label",
+                            "Enter a label for this stage:",
+                            [
+                              { text: "Cancel", style: "cancel" },
                               {
-                                imageUri: result.assets[0].uri,
-                                label: defaultLabel,
-                                description: "",
+                                text: "Add",
+                                onPress: (label) => {
+                                  setProcessStages((prev) => [
+                                    ...prev,
+                                    {
+                                      imageUri: result.assets[0].uri,
+                                      label: label || defaultLabel,
+                                      description: "",
+                                    },
+                                  ]);
+                                },
                               },
-                            ]);
+                            ],
+                            "plain-text",
+                            defaultLabel
+                          )
+                          : setProcessStages((prev) => [
+                            ...prev,
+                            {
+                              imageUri: result.assets[0].uri,
+                              label: defaultLabel,
+                              description: "",
+                            },
+                          ]);
                       }
                     } catch (error) {
                       console.error("Error picking stage image:", error);

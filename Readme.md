@@ -250,9 +250,9 @@ A mobile and web platform that:
 
 1. **Lossless Upload & Zoomable Viewer** — Upload high-res images with optional watermarking
 2. **Annotation Critique Mode** — Draw-on-image feedback (public or private) with versioned replies
-4. **Commission & Storefront** — Commission requests, direct sales, and order tracking
-5. **Curated Challenges** — Community-driven art events and challenges
-6. **Collab Board & Matchmaking** — Post project invites and find collaborators by skill and style
+3. **Commission & Storefront** — Commission requests, direct sales, and order tracking
+4. **Curated Challenges** — Community-driven art events and challenges
+5. **Collab Board & Matchmaking** — Post project invites and find collaborators by skill and style
 
 ---
 

@@ -27,7 +27,8 @@ const PostDetailScreen = ({ route, navigation }) => {
   const [hasLiked, setHasLiked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [imageAspectRatio, setImageAspectRatio] = useState(4 / 5);
+  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+  const [imageHeight, setImageHeight] = useState(400); // fallback height
 
   const loadData = useCallback(async () => {
     try {
@@ -54,21 +55,28 @@ const PostDetailScreen = ({ route, navigation }) => {
     loadData();
   }, [loadData]);
 
-  // Measure main image aspect ratio
+  // Measure main image dimensions and calculate height for full screen width
   useEffect(() => {
     if (post?.imageUrl) {
       Image.getSize(
         post.imageUrl,
-        (w, h) => {
-          if (w > 0 && h > 0) {
-            const ratio = Math.min(2, Math.max(0.5, w / h));
-            setImageAspectRatio(ratio);
+        (originalWidth, originalHeight) => {
+          if (originalWidth > 0 && originalHeight > 0) {
+            setImageDimensions({ width: originalWidth, height: originalHeight });
+
+            // Calculate height for full screen width while maintaining aspect ratio
+            const aspectRatio = originalHeight / originalWidth;
+            const calculatedHeight = Math.round(screenWidth * aspectRatio);
+            setImageHeight(calculatedHeight);
           }
         },
-        () => { },
+        () => {
+          // Fallback - use 4:5 ratio
+          setImageHeight(Math.round(screenWidth / (4 / 5)));
+        },
       );
     }
-  }, [post?.imageUrl]);
+  }, [post?.imageUrl, screenWidth]);
 
   const handleShare = () => {
     Alert.alert("Share", "Share functionality coming soon!");
@@ -115,21 +123,18 @@ const PostDetailScreen = ({ route, navigation }) => {
   );
 
   const renderImageCarousel = () => {
-    const imgWidth = screenWidth;
-    const imgHeight = Math.round(imgWidth / imageAspectRatio);
-
     if (!isCarousel) {
       return (
         <Image
           source={{ uri: post.imageUrl }}
-          style={{ width: imgWidth, height: imgHeight, backgroundColor: COLORS.gray200 }}
+          style={{ width: screenWidth, height: imageHeight, backgroundColor: COLORS.gray200 }}
           resizeMode="cover"
         />
       );
     }
 
     return (
-      <View style={[styles.carouselContainer, { height: imgHeight }]}>
+      <View style={[styles.carouselContainer, { height: imageHeight }]}>
         <ScrollView
           horizontal
           pagingEnabled
@@ -140,10 +145,10 @@ const PostDetailScreen = ({ route, navigation }) => {
           scrollEventThrottle={16}
         >
           {carouselData.map((slide, idx) => (
-            <View key={`detail-slide-${idx}`} style={{ width: imgWidth, height: imgHeight }}>
+            <View key={`detail-slide-${idx}`} style={{ width: screenWidth, height: imageHeight }}>
               <Image
                 source={{ uri: slide.imageUrl }}
-                style={{ width: imgWidth, height: imgHeight }}
+                style={{ width: screenWidth, height: imageHeight }}
                 resizeMode="cover"
               />
               {slide.stageLabel && (
@@ -367,13 +372,13 @@ const styles = StyleSheet.create({
   carouselContainer: {
     width: "100%",
     overflow: "hidden",
-    backgroundColor: COLORS.gray200,
+    backgroundColor: "transparent",
   },
   stageLabelOverlay: {
     position: "absolute",
     bottom: 12,
     left: 12,
-    backgroundColor: "rgba(0, 0, 0, 0.65)",
+    backgroundColor: "transparent",
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 6,
