@@ -68,11 +68,11 @@ const UserProfileScreen = ({ route, navigation }) => {
 
       // Check if current user is following this user
       if (currentUser?.id) {
-        const following = await followAPI.checkFollowing(
+        const result = await followAPI.checkFollowing(
           userId,
           currentUser.id
         );
-        setIsFollowing(following);
+        setIsFollowing(result.isFollowing);
       }
 
       setStats({

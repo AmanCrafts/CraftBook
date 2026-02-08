@@ -23,18 +23,35 @@ const FollowListModal = ({
   onUserPress,
 }) => {
   const [users, setUsers] = useState([]);
+  const [followStatuses, setFollowStatuses] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadUsers = async () => {
       setLoading(true);
       try {
+        let userList = [];
         if (type === "followers") {
           const result = await followAPI.getFollowers(userId);
-          setUsers(result.followers || []);
+          userList = result.followers || [];
         } else {
           const result = await followAPI.getFollowing(userId);
-          setUsers(result.following || []);
+          userList = result.following || [];
+        }
+        setUsers(userList);
+
+        // Batch check which users the current user is following
+        if (currentUserId && userList.length > 0) {
+          const otherUserIds = userList
+            .filter((u) => u.id !== currentUserId)
+            .map((u) => u.id);
+          if (otherUserIds.length > 0) {
+            const statuses = await followAPI.checkFollowingBatch(
+              currentUserId,
+              otherUserIds
+            );
+            setFollowStatuses(statuses);
+          }
         }
       } catch (error) {
         console.error(`Error loading ${type}:`, error);
@@ -47,7 +64,7 @@ const FollowListModal = ({
     if (visible && userId) {
       loadUsers();
     }
-  }, [visible, userId, type]);
+  }, [visible, userId, type, currentUserId]);
 
   const handleUserPress = (user) => {
     onClose();
@@ -80,6 +97,7 @@ const FollowListModal = ({
         <FollowButton
           userId={item.id}
           currentUserId={currentUserId}
+          initialIsFollowing={!!followStatuses[item.id]}
           size="small"
           showIcon={false}
         />

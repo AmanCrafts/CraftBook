@@ -20,14 +20,31 @@ const FollowButton = ({
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    setIsFollowing(initialIsFollowing);
+  }, [initialIsFollowing]);
+
+  // Fetch actual follow status on mount when initialIsFollowing is not provided
+  useEffect(() => {
+    const checkStatus = async () => {
+      if (!userId || !currentUserId || userId === currentUserId) return;
+      try {
+        const result = await followAPI.checkFollowing(userId, currentUserId);
+        setIsFollowing(result.isFollowing);
+      } catch (error) {
+        console.error("Error checking follow status:", error);
+      }
+    };
+    // Only self-check if no explicit initial value was given
+    if (!initialIsFollowing) {
+      checkStatus();
+    }
+  }, [userId, currentUserId, initialIsFollowing]);
+
   // Don't render if viewing own profile
   if (!userId || !currentUserId || userId === currentUserId) {
     return null;
   }
-
-  useEffect(() => {
-    setIsFollowing(initialIsFollowing);
-  }, [initialIsFollowing]);
 
   const handleToggleFollow = async () => {
     if (loading) return;

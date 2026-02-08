@@ -114,7 +114,11 @@ const HomeScreen = ({ navigation }) => {
         }
 
         if (isLoadMore) {
-          setPosts((prev) => [...prev, ...data]);
+          setPosts((prev) => {
+            const existingIds = new Set(prev.map((p) => p.id));
+            const uniqueNew = data.filter((p) => !existingIds.has(p.id));
+            return [...prev, ...uniqueNew];
+          });
         } else {
           setPosts(data);
         }
