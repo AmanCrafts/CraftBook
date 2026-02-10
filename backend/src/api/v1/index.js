@@ -2,7 +2,9 @@ import express from "express";
 import authRoutes from "../../modules/auth/auth.routes.js";
 import commentRoutes from "../../modules/comment/comment.routes.js";
 import followRoutes from "../../modules/follow/follow.routes.js";
+import hireRoutes from "../../modules/hire/hire.routes.js";
 import likeRoutes from "../../modules/like/like.routes.js";
+import marketplaceRoutes from "../../modules/marketplace/marketplace.routes.js";
 import postRoutes from "../../modules/post/post.routes.js";
 import uploadRoutes from "../../modules/upload/upload.routes.js";
 import userRoutes from "../../modules/user/user.routes.js";
@@ -31,5 +33,7 @@ router.use("/posts", postRoutes);
 router.use("/posts", likeRoutes);
 router.use("/posts", commentRoutes);
 router.use("/upload", uploadRoutes);
+router.use("/marketplace", marketplaceRoutes);
+router.use("/hire", hireRoutes);
 
 export default router;
