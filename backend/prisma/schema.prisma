@@ -33,6 +33,12 @@ model User {
   followers Follow[]  @relation("UserFollowers")
   following Follow[]  @relation("UserFollowing")
 
+  // Marketplace & Hiring
+  listings             Listing[]     @relation("UserListings")
+  orders               Order[]       @relation("UserOrders")
+  hireRequestsAsClient HireRequest[] @relation("HireRequestsAsClient")
+  hireRequestsAsArtist HireRequest[] @relation("HireRequestsAsArtist")
+
   @@map("users")
 }
 
@@ -53,6 +59,7 @@ model Post {
   author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   comments Comment[]
   likes    Like[]
+  listings Listing[]
 
   @@map("posts")
 }
@@ -107,4 +114,93 @@ model Image {
   createdAt DateTime @default(now())
 
   @@map("images")
+}
+
+// ===== Marketplace & Hiring Models =====
+
+model Listing {
+  id          String        @id @default(cuid())
+  title       String
+  description String?       @db.Text
+  imageUrl    String
+  price       Float
+  currency    String        @default("USD")
+  category    String? // e.g. "painting", "digital", "sculpture"
+  medium      String? // Art medium
+  status      ListingStatus @default(AVAILABLE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  sellerId String
+  seller   User    @relation("UserListings", fields: [sellerId], references: [id], onDelete: Cascade)
+  postId   String? // optional link to an existing post
+  post     Post?   @relation(fields: [postId], references: [id], onDelete: SetNull)
+  orders   Order[]
+
+  @@map("listings")
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  status    OrderStatus @default(PENDING)
+  quantity  Int         @default(1)
+  total     Float
+  note      String?     @db.Text
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Relations
+  buyerId   String
+  buyer     User    @relation("UserOrders", fields: [buyerId], references: [id], onDelete: Cascade)
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@map("orders")
+}
+
+model HireRequest {
+  id              String            @id @default(cuid())
+  title           String
+  description     String            @db.Text
+  budget          Float?
+  currency        String            @default("USD")
+  deadline        DateTime?
+  status          HireRequestStatus @default(PENDING)
+  referenceImages Json? // Array of image URLs for reference
+  response        String?           @db.Text // Artist's response message
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  // Relations
+  clientId String
+  client   User   @relation("HireRequestsAsClient", fields: [clientId], references: [id], onDelete: Cascade)
+  artistId String
+  artist   User   @relation("HireRequestsAsArtist", fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@map("hire_requests")
+}
+
+// Enums
+enum ListingStatus {
+  AVAILABLE
+  SOLD
+  REMOVED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum HireRequestStatus {
+  PENDING
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  DECLINED
+  CANCELLED
 }
