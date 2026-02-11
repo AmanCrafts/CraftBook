@@ -25,6 +25,25 @@ export const API_ENDPOINTS = {
   // Upload Endpoints
   UPLOAD_IMAGE: "/api/upload",
   DELETE_IMAGE: (id) => `/api/upload/${id}`,
+
+  // Marketplace Endpoints
+  LISTINGS: "/api/marketplace/listings",
+  LISTING_BY_ID: (id) => `/api/marketplace/listings/${id}`,
+  LISTINGS_SEARCH: "/api/marketplace/listings/search",
+  ORDERS: "/api/marketplace/orders",
+  ORDER_BY_ID: (id) => `/api/marketplace/orders/${id}`,
+  ORDERS_BY_BUYER: (buyerId) => `/api/marketplace/orders/buyer/${buyerId}`,
+  ORDERS_BY_SELLER: (sellerId) => `/api/marketplace/orders/seller/${sellerId}`,
+  ORDER_STATUS: (id) => `/api/marketplace/orders/${id}/status`,
+
+  // Hire Endpoints
+  HIRE: "/api/hire",
+  HIRE_BY_ID: (id) => `/api/hire/${id}`,
+  HIRE_BY_CLIENT: (clientId) => `/api/hire/client/${clientId}`,
+  HIRE_BY_ARTIST: (artistId) => `/api/hire/artist/${artistId}`,
+  HIRE_RESPOND: (id) => `/api/hire/${id}/respond`,
+  HIRE_STATUS: (id) => `/api/hire/${id}/status`,
+  HIRE_CANCEL: (id) => `/api/hire/${id}/cancel`,
 };
 
 export default API_ENDPOINTS;
