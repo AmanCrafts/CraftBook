@@ -11,11 +11,21 @@ export const ROUTES = {
   // Tab Navigation
   HOME: "Home",
   EXPLORE: "Explore",
+  MARKETPLACE: "Marketplace",
   UPLOAD: "Upload",
   PROFILE: "Profile",
 
   // Profile
   USER_PROFILE: "UserProfile",
+
+  // Marketplace
+  LISTING_DETAIL: "ListingDetail",
+  CREATE_LISTING: "CreateListing",
+  MY_ORDERS: "MyOrders",
+
+  // Hire
+  CREATE_HIRE_REQUEST: "CreateHireRequest",
+  HIRE_REQUESTS: "HireRequests",
 };
 
 export default ROUTES;

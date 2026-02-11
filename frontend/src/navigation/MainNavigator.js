@@ -6,6 +6,7 @@ import ROUTES from "../constants/routes";
 // Import screens
 import ExploreScreen from "../screens/Explore/ExploreScreen";
 import HomeScreen from "../screens/Home/HomeScreen";
+import MarketplaceScreen from "../screens/Marketplace/MarketplaceScreen";
 import ProfileScreen from "../screens/Profile/ProfileScreen";
 import UploadScreen from "../screens/Upload/UploadScreen";
 
@@ -33,7 +34,7 @@ const MainNavigator = () => {
           elevation: 8,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: "600",
           marginTop: 4,
         },
@@ -44,6 +45,8 @@ const MainNavigator = () => {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === ROUTES.EXPLORE) {
             iconName = focused ? "compass" : "compass-outline";
+          } else if (route.name === ROUTES.MARKETPLACE) {
+            iconName = focused ? "storefront" : "storefront-outline";
           } else if (route.name === ROUTES.UPLOAD) {
             iconName = focused ? "add-circle" : "add-circle-outline";
           } else if (route.name === ROUTES.PROFILE) {
@@ -66,6 +69,13 @@ const MainNavigator = () => {
         component={ExploreScreen}
         options={{
           tabBarLabel: "Explore",
+        }}
+      />
+      <Tab.Screen
+        name={ROUTES.MARKETPLACE}
+        component={MarketplaceScreen}
+        options={{
+          tabBarLabel: "Shop",
         }}
       />
       <Tab.Screen
