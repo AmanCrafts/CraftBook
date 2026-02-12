@@ -5,6 +5,11 @@ import { useAuth } from "../contexts/AuthContext";
 
 // Import screens
 import LoginScreen from "../screens/Auth/LoginScreen";
+import CreateHireRequestScreen from "../screens/Hire/CreateHireRequestScreen";
+import HireRequestsScreen from "../screens/Hire/HireRequestsScreen";
+import CreateListingScreen from "../screens/Marketplace/CreateListingScreen";
+import ListingDetailScreen from "../screens/Marketplace/ListingDetailScreen";
+import MyOrdersScreen from "../screens/Marketplace/MyOrdersScreen";
 import PostDetailScreen from "../screens/PostDetail/PostDetailScreen";
 import CompleteProfileScreen from "../screens/Profile/CompleteProfileScreen";
 import UserProfileScreen from "../screens/Profile/UserProfileScreen";
@@ -81,6 +86,41 @@ const AppNavigator = () => {
       <Stack.Screen
         name={ROUTES.USER_PROFILE}
         component={UserProfileScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name={ROUTES.LISTING_DETAIL}
+        component={ListingDetailScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name={ROUTES.CREATE_LISTING}
+        component={CreateListingScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name={ROUTES.MY_ORDERS}
+        component={MyOrdersScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name={ROUTES.CREATE_HIRE_REQUEST}
+        component={CreateHireRequestScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name={ROUTES.HIRE_REQUESTS}
+        component={HireRequestsScreen}
         options={{
           headerShown: false,
         }}
