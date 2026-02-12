@@ -7,6 +7,8 @@ const ProfileActions = ({
   onEdit,
   onShare,
   onSettings,
+  onMyOrders,
+  onHireRequests,
   isOwnProfile = true,
 }) => {
   if (!isOwnProfile) {
@@ -41,8 +43,27 @@ const ProfileActions = ({
 
       <View style={styles.secondaryActions}>
         <Button
-          title="Share"
+          title="Orders"
           variant="outline"
+          size="small"
+          icon="bag-handle-outline"
+          onPress={onMyOrders}
+          style={styles.secondaryButton}
+        />
+        <Button
+          title="Commissions"
+          variant="outline"
+          size="small"
+          icon="brush-outline"
+          onPress={onHireRequests}
+          style={styles.secondaryButton}
+        />
+      </View>
+
+      <View style={styles.secondaryActions}>
+        <Button
+          title="Share"
+          variant="ghost"
           size="small"
           icon="share-social-outline"
           onPress={onShare}

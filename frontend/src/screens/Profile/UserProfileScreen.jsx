@@ -230,6 +230,22 @@ const UserProfileScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
 
+        {/* Hire Artist Button */}
+        <View style={styles.hireContainer}>
+          <TouchableOpacity
+            style={styles.hireButton}
+            onPress={() =>
+              navigation.navigate(ROUTES.CREATE_HIRE_REQUEST, {
+                artistId: userId,
+                artistName: user?.name,
+              })
+            }
+          >
+            <Ionicons name="brush" size={18} color={COLORS.white} />
+            <Text style={styles.hireButtonText}>Hire {user?.name?.split(" ")[0] || "Artist"}</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Artist Info Section */}
         {user.medium && (
           <ArtistInfo
@@ -374,6 +390,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.border,
+  },
+  hireContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 4,
+  },
+  hireButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: COLORS.accent,
+    paddingVertical: 12,
+    borderRadius: 12,
+    gap: 8,
+  },
+  hireButtonText: {
+    color: COLORS.white,
+    fontSize: 15,
+    fontWeight: "700",
   },
   postsSection: {
     paddingHorizontal: 16,

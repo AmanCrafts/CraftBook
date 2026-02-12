@@ -319,6 +319,8 @@ const ProfileScreen = ({ navigation }) => {
           onEdit={() => setEditModalVisible(true)}
           onShare={handleShare}
           onSettings={handleSettings}
+          onMyOrders={() => navigation.navigate(ROUTES.MY_ORDERS)}
+          onHireRequests={() => navigation.navigate(ROUTES.HIRE_REQUESTS)}
           isOwnProfile
         />
 
