@@ -6,6 +6,10 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/6f142bfa-5f24-48ba-9532-2f7952e122d6"
+    },
 
     "splash": {
       "image": "./assets/splash-icon.png",

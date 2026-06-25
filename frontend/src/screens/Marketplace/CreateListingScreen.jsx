@@ -71,7 +71,10 @@ const CreateListingScreen = ({ navigation }) => {
 
             // Upload image first
             const uploadResult = await uploadAPI.uploadImage(imageUri);
-            const imageUrl = uploadResult.url || uploadResult.imageUrl;
+            const imageUrl = uploadResult.image?.url;
+            if (!imageUrl) {
+                throw new Error("Failed to get image URL from upload");
+            }
 
             // Create listing
             await marketplaceAPI.createListing({
