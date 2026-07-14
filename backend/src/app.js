@@ -7,6 +7,7 @@ import {
   notFoundHandler,
 } from "./middlewares/error.middleware.js";
 import { requestLogger } from "./middlewares/logger.middleware.js";
+import { prisma } from "../src/config/database.js";
 
 /**
  * Initialize Express Application
@@ -41,6 +42,22 @@ app.get("/", (_req, res) => {
     status: "running",
     environment: config.nodeEnv,
   });
+});
+
+// GET /health/db
+
+app.get("/health/db", async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.status(200).json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+    });
+  }
 });
 
 // API v1 routes
